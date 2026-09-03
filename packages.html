@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الباقات والاشتراك — The Pearl Series</title>
+<meta name="description" content="باقات الاشتراك في منصة The Pearl Series — Five Stars in English — الأستاذ Youssef Osman">
+<link rel="icon" href="assets/img/pearl-logo.jpg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/theme.css">
+<style>
+  /* ===== أنماط خاصة بصفحة الباقات فقط ===== */
+  .pk-hero{text-align:center;padding:38px 20px 10px}
+  .pk-hero img{height:86px;width:auto;margin:0 auto 14px}
+  .pk-hero h1{font-family:"Playfair Display",serif;color:var(--brand);margin:0;font-size:clamp(1.6rem,4vw,2.2rem)}
+  .pk-hero p{color:var(--text-muted);margin:8px 0 0}
+
+  .pk-grid{
+    display:grid;gap:20px;margin:30px 0 10px;align-items:stretch;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  }
+  .pk{
+    position:relative;display:flex;flex-direction:column;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r-xl);box-shadow:var(--shadow-sm);overflow:hidden;
+    transition:transform var(--tr),box-shadow var(--tr);
+  }
+  .pk:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+  .pk-top{background:var(--sheen);padding:24px 22px 20px;border-bottom:1px solid var(--border);text-align:center}
+  .pk h3{margin:0 0 4px;font-size:1.2rem}
+  .pk .pk-sub{font-size:.82rem;color:var(--text-muted);font-family:"Poppins",sans-serif}
+  .pk .price{margin:14px 0 0;font-family:"Poppins",sans-serif;font-weight:700;font-size:2rem;color:var(--brand);line-height:1}
+  .pk .price small{font-size:.8rem;font-weight:500;color:var(--text-muted);display:block;margin-top:6px;font-family:var(--font-ar)}
+  .pk ul{list-style:none;margin:0;padding:22px;display:flex;flex-direction:column;gap:11px;flex:1}
+  .pk li{display:flex;gap:9px;align-items:flex-start;font-size:.92rem}
+  .pk li::before{content:"✓";color:var(--ok);font-weight:800;flex:none}
+  .pk li.no{color:var(--text-muted)}
+  .pk li.no::before{content:"—";color:var(--text-muted)}
+  .pk .pk-foot{padding:0 22px 22px}
+
+  /* الباقة المميزة */
+  .pk-featured{border-color:var(--navy-400);box-shadow:var(--shadow-md)}
+  .pk-featured .pk-top{background:linear-gradient(135deg,var(--navy-600),var(--navy-500));color:#fff}
+  .pk-featured .pk-top h3,.pk-featured .price{color:#fff}
+  .pk-featured .pk-sub,.pk-featured .price small{color:rgba(255,255,255,.78)}
+  .pk-tag{
+    position:absolute;top:14px;inset-inline-start:14px;z-index:2;
+    background:var(--gold);color:#231c00;font-size:.68rem;font-weight:800;
+    padding:4px 11px;border-radius:var(--r-full);
+  }
+
+  .pk-how{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:14px}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+  .step b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;
+    background:var(--brand-soft);color:var(--brand);font-family:"Poppins",sans-serif;margin-bottom:10px}
+  .step h4{margin:0 0 4px;font-size:.98rem}
+  .step p{margin:0;font-size:.86rem;color:var(--text-muted)}
+
+  .faq{margin-top:14px}
+  .faq details{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:10px}
+  .faq summary{cursor:pointer;padding:14px 18px;font-weight:700;font-size:.92rem;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::before{content:"+ ";color:var(--brand);font-weight:800}
+  .faq details[open] summary::before{content:"− "}
+  .faq p{margin:0;padding:0 18px 16px;color:var(--text-muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series">
+      <span class="brand-text">
+        <span class="brand-title">The Pearl Series</span>
+        <span class="brand-sub">Five Stars in English</span>
+      </span>
+    </a>
+    <span class="header-spacer"></span>
+    <div class="header-actions">
+      <span class="teacher-badge">Youssef Osman</span>
+      <button id="theme-btn" class="btn-icon" type="button" aria-label="تبديل المظهر">🌙</button>
+      <a class="btn btn-ghost btn-sm" href="index.html">تسجيل الدخول</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="pk-hero">
+    <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series">
+    <h1>باقات الاشتراك</h1>
+    <p>اختر الباقة المناسبة لابنك، وابدأ خلال دقائق. الاشتراك سنوي كامل.</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       لتعديل الأسعار: غيّر الرقم داخل <span class="price"> فقط.
+       لتعديل محتوى الباقة: عدّل عناصر <li> (استخدم class="no" لميزة غير متاحة).
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="pk-grid">
+
+    <!-- 1) باقة الصف الواحد -->
+    <article class="pk">
+      <div class="pk-top">
+        <h3>باقة الصف الواحد</h3>
+        <span class="pk-sub">One Grade</span>
+        <p class="price">٢٥٠ <small>جنيهًا / السنة الدراسية</small></p>
+      </div>
+      <ul>
+        <li>صف دراسي واحد تختاره</li>
+        <li>كل كتب ودروس الصف تفاعليًا</li>
+        <li>كويزات وتمارين نطق بالصوت</li>
+        <li>متابعة على مدار السنة</li>
+        <li class="no">باقي صفوف المرحلة</li>
+        <li class="no">القواعد وبنك الامتحانات</li>
+      </ul>
+      <div class="pk-foot">
+        <a class="btn btn-ghost btn-block wa" data-pkg="باقة الصف الواحد" target="_blank" rel="noopener">اشترك الآن</a>
+      </div>
+    </article>
+
+    <!-- 2) باقة المرحلة (المميزة) -->
+    <article class="pk pk-featured">
+      <span class="pk-tag">الأكثر طلبًا</span>
+      <div class="pk-top">
+        <h3>باقة المرحلة</h3>
+        <span class="pk-sub">Full Stage</span>
+        <p class="price">٥٠٠ <small>جنيهًا / السنة الدراسية</small></p>
+      </div>
+      <ul>
+        <li>كل صفوف المرحلة (ابتدائي أو إعدادي أو ثانوي)</li>
+        <li>مناسبة لأكثر من ابن في نفس المرحلة</li>
+        <li>كل الكتب والدروس والكويزات</li>
+        <li>قسم القواعد (Grammar Lab)</li>
+        <li>متابعة وتحديثات طوال السنة</li>
+        <li class="no">بنك الامتحانات ودروس السبورة</li>
+      </ul>
+      <div class="pk-foot">
+        <a class="btn btn-primary btn-block wa" data-pkg="باقة المرحلة" target="_blank" rel="noopener">اشترك الآن</a>
+      </div>
+    </article>
+
+    <!-- 3) الباقة الشاملة -->
+    <article class="pk">
+      <div class="pk-top">
+        <h3>الباقة الشاملة</h3>
+        <span class="pk-sub">All Access</span>
+        <p class="price">٨٠٠ <small>جنيهًا / السنة الدراسية</small></p>
+      </div>
+      <ul>
+        <li>كل الأقسام من التأسيس حتى الثانوي</li>
+        <li>القواعد + بنك الامتحانات + السبورة الذكية</li>
+        <li>الأولوية في الرد والدعم</li>
+        <li>كل الأقسام الجديدة فور إضافتها</li>
+        <li>الأنسب للإخوة في صفوف مختلفة</li>
+      </ul>
+      <div class="pk-foot">
+        <a class="btn btn-ghost btn-block wa" data-pkg="الباقة الشاملة" target="_blank" rel="noopener">اشترك الآن</a>
+      </div>
+    </article>
+  </section>
+
+  <div class="section-title"><h3>إزاي تشترك؟</h3></div>
+  <section class="pk-how">
+    <div class="step">
+      <b>1</b><h4>اختر الباقة</h4>
+      <p>اضغط «اشترك الآن» فتصلنا رسالة واتساب بالباقة التي اخترتها.</p>
+    </div>
+    <div class="step">
+      <b>2</b><h4>ادفع وأرسل الإيصال</h4>
+      <p>فودافون كاش أو إنستاباي، ثم أرسل صورة الإيصال مع بريد Google الخاص بك.</p>
+    </div>
+    <div class="step">
+      <b>3</b><h4>نفعّل حسابك</h4>
+      <p>نضيف بريدك خلال دقائق، ويصلك تأكيد على الواتساب.</p>
+    </div>
+    <div class="step">
+      <b>4</b><h4>ادخل بضغطة</h4>
+      <p>افتح المنصة واضغط «الدخول بحساب Google» — بدون كلمات مرور.</p>
+    </div>
+  </section>
+
+  <div class="section-title"><h3>أسئلة شائعة</h3></div>
+  <section class="faq">
+    <details open>
+      <summary>هل أحتاج كلمة مرور؟</summary>
+      <p>لا. تدخل بحساب Google الذي أرسلته لنا. من لم يُسجَّل بريده لا يستطيع فتح أي قسم.</p>
+    </details>
+    <details>
+      <summary>هل يمكن مشاركة الحساب مع صديق؟</summary>
+      <p>لا. الحساب مرتبط ببريد Google شخصي، ومشاركته تعرّض حسابك الشخصي للخطر. عند اكتشاف المشاركة يتم إيقاف الاشتراك دون استرداد.</p>
+    </details>
+    <details>
+      <summary>هل أستطيع الترقية من باقة لأخرى؟</summary>
+      <p>نعم، في أي وقت. تدفع الفرق فقط ونضيف الأقسام الجديدة لحسابك فورًا.</p>
+    </details>
+    <details>
+      <summary>على كم جهاز أستطيع الدخول؟</summary>
+      <p>تدخل من الموبايل والتابلت والكمبيوتر بنفس الحساب، طالما الاستخدام لأسرة واحدة.</p>
+    </details>
+    <details>
+      <summary>ماذا يحدث بعد انتهاء السنة؟</summary>
+      <p>يظهر لك تنبيه قبل الانتهاء بأسبوع، وبعدها تُقفل الأقسام حتى التجديد. بياناتك تبقى محفوظة.</p>
+    </details>
+  </section>
+
+  <div class="card card-pad" style="margin-top:26px;text-align:center">
+    <h3 style="margin:0 0 6px">عندك سؤال قبل الاشتراك؟</h3>
+    <p style="color:var(--text-muted);margin:0 0 16px">راسلنا على واتساب وسنرد عليك بنفسي.</p>
+    <a class="btn btn-primary wa" data-pkg="استفسار عن الباقات" target="_blank" rel="noopener">تواصل على واتساب</a>
+  </div>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> <span class="sig">The Pearl Series</span> — جميع الحقوق محفوظة للأستاذ Youssef Osman</p>
+  </footer>
+</main>
+
+<script type="module">
+  import { BRAND } from "./firebase/firebase-config.js";
+
+  /* روابط واتساب لكل باقة */
+  document.querySelectorAll(".wa").forEach(a => {
+    const pkg = a.dataset.pkg;
+    const text = `السلام عليكم أ/ ${BRAND.teacher}،\nأريد الاشتراك في: ${pkg}\nاسم الطالب:\nالصف:`;
+    a.href = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(text)}`;
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* المظهر الليلي/النهاري — نفس مفتاح المنصة */
+  const KEY = "pearl.theme", root = document.documentElement, btn = document.getElementById("theme-btn");
+  function apply(t){ root.dataset.theme = t; btn.textContent = t === "dark" ? "☀️" : "🌙";
+                     try{ localStorage.setItem(KEY,t); }catch{} }
+  let saved = null; try{ saved = localStorage.getItem(KEY); }catch{}
+  apply(saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  btn.addEventListener("click", () => apply(root.dataset.theme === "dark" ? "light" : "dark"));
+</script>
+</body>
+</html>
