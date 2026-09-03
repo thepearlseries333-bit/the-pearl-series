@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الإدارة — The Pearl Series</title>
+<link rel="icon" href="../assets/img/pearl-logo.jpg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css">
+</head>
+<body>
+
+<div id="admin-loading" class="center-load">
+  <img src="../assets/img/pearl-logo.jpg" alt="" style="height:80px;margin-inline:auto">
+  <span class="spinner"></span>
+  <p>جارٍ التحقق من صلاحيات الإدارة…</p>
+</div>
+
+<!-- منع الوصول -->
+<main id="admin-denied" class="auth-screen" hidden>
+  <div class="auth-card">
+    <div class="auth-hero">
+      <img src="../assets/img/pearl-logo.jpg" alt="">
+      <h1>لوحة الإدارة</h1>
+    </div>
+    <div class="auth-body">
+      <div id="admin-denied-msg" class="msg msg-err">هذه الصفحة مخصّصة للمشرف فقط.</div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <a class="btn btn-ghost" href="../index.html">الرجوع للمنصة</a>
+        <button id="admin-logout2" class="btn btn-ghost" type="button">تسجيل الخروج</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- لوحة الإدارة -->
+<div id="admin-app" hidden>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <img src="../assets/img/pearl-logo.jpg" alt="The Pearl Series">
+        <span class="brand-text">
+          <span class="brand-title">لوحة الإدارة</span>
+          <span class="brand-sub">The Pearl Series — Youssef Osman</span>
+        </span>
+      </div>
+      <span class="header-spacer"></span>
+      <div class="header-actions">
+        <span id="admin-who" class="teacher-badge mono" dir="ltr"></span>
+        <a class="btn btn-ghost btn-sm" href="../index.html">المنصة</a>
+        <button id="theme-btn" class="btn-icon" type="button" aria-label="تبديل المظهر">🌙</button>
+        <button id="admin-logout" class="btn btn-ghost btn-sm" type="button">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h2>إدارة الاشتراكات</h2>
+        <p>أضف بريد ولي الأمر بعد تأكيد الدفع، وحدّد الصفوف المفتوحة وتاريخ الانتهاء.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b id="s-total">0</b><span>إجمالي</span></div>
+        <div class="stat"><b id="s-active">0</b><span>نشط</span></div>
+        <div class="stat"><b id="s-expired">0</b><span>منتهٍ</span></div>
+        <div class="stat"><b id="s-soon">0</b><span>ينتهي خلال 7 أيام</span></div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <input id="search" class="input" type="search" placeholder="ابحث بالبريد أو الاسم أو رقم الهاتف…">
+      <select id="filter-status" class="input" style="width:auto;min-width:150px">
+        <option value="">كل الحالات</option>
+        <option value="active">نشط</option>
+        <option value="expired">منتهٍ</option>
+        <option value="suspended">موقوف</option>
+      </select>
+      <button id="btn-add" class="btn btn-primary">+ إضافة مشترك</button>
+      <button id="btn-content" class="btn btn-ghost">روابط الأقسام</button>
+      <button id="btn-refresh" class="btn btn-ghost" title="تحديث">↻</button>
+    </div>
+
+    <div id="admin-msg" class="msg" hidden></div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>البريد الإلكتروني</th>
+            <th>الاسم</th>
+            <th>الهاتف</th>
+            <th>الحالة</th>
+            <th>الأقسام</th>
+            <th>ينتهي في</th>
+            <th style="width:190px">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="empty" class="empty" hidden>لا يوجد مشتركون بعد. اضغط «إضافة مشترك».</div>
+    </div>
+
+    <footer class="site-footer">
+      <p><span class="sig">The Pearl Series</span> — لوحة إدارة الاشتراكات</p>
+    </footer>
+  </main>
+</div>
+
+<!-- ═══ مودال إضافة/تعديل مشترك ═══ -->
+<div id="member-modal" class="modal-back" hidden>
+  <form class="modal" id="member-form">
+    <div class="modal-head"><h3 id="member-modal-title">إضافة مشترك</h3></div>
+    <div class="modal-body">
+      <label class="field">
+        <span>البريد الإلكتروني *</span>
+        <input id="f-email" class="input" type="email" dir="ltr" required placeholder="parent@example.com">
+        <span class="hint">يُستخدم كمعرّف للحساب — لا يمكن تعديله بعد الحفظ (احذف وأضِف من جديد).</span>
+      </label>
+      <div class="row2">
+        <label class="field"><span>اسم الطالب / ولي الأمر</span>
+          <input id="f-name" class="input" type="text" placeholder="مثال: أحمد محمد"></label>
+        <label class="field"><span>رقم الهاتف</span>
+          <input id="f-phone" class="input" type="tel" dir="ltr" placeholder="010xxxxxxxx"></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span>الحالة</span>
+          <select id="f-status" class="input">
+            <option value="active">نشط</option>
+            <option value="suspended">موقوف</option>
+          </select></label>
+        <label class="field"><span>تاريخ انتهاء الاشتراك</span>
+          <input id="f-expires" class="input" type="date">
+          <span class="hint">اتركه فارغًا = اشتراك دائم بلا انتهاء.</span></label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 16px">
+        <button type="button" class="btn btn-ghost btn-sm" data-add-days="30">+ شهر</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-add-days="90">+ 3 شهور</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-add-days="365">+ سنة</button>
+      </div>
+
+      <div class="field">
+        <span style="display:block;font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--text-muted)">
+          الأقسام المفتوحة *
+        </span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button type="button" id="pick-all" class="btn btn-ghost btn-sm">تحديد الكل</button>
+          <button type="button" id="pick-none" class="btn btn-ghost btn-sm">إلغاء الكل</button>
+        </div>
+        <div id="f-sections" class="chips"></div>
+      </div>
+
+      <label class="field"><span>ملاحظات (تظهر لك فقط)</span>
+        <textarea id="f-notes" class="input" rows="2" placeholder="مثال: دفع 300ج فودافون كاش بتاريخ..."></textarea></label>
+      <div id="form-msg" class="msg" hidden></div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" id="member-cancel" class="btn btn-ghost">إلغاء</button>
+      <button type="submit" id="member-save" class="btn btn-primary">حفظ</button>
+    </div>
+  </form>
+</div>
+
+<!-- ═══ مودال روابط الأقسام ═══ -->
+<div id="content-modal" class="modal-back" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3>روابط ملفات الأقسام</h3></div>
+    <div class="modal-body">
+      <div class="msg msg-info" style="margin-top:0">
+        اكتب مسار ملف HTML لكل قسم، مثل:
+        <span class="mono" dir="ltr">sections/p1-a7f3c2e9.html</span><br>
+        <strong>نصيحة أمنية:</strong> اجعل اسم الملف يحتوي رمزًا عشوائيًا (كما في المثال)
+        حتى لا يخمّنه أحد. هذا المسار لا يقرأه إلا المشترك في هذا القسم.
+      </div>
+      <div id="content-list" class="stack"></div>
+      <div id="content-msg" class="msg" hidden></div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" id="content-close" class="btn btn-ghost">إغلاق</button>
+      <button type="button" id="content-save" class="btn btn-primary">حفظ الروابط</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>
