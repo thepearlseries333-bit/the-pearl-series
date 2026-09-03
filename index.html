@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pearl Series — منصة الأستاذ يوسف عثمان</title>
+<meta name="description" content="منصة The Pearl Series التعليمية — Five Stars in English — الأستاذ Youssef Osman">
+<link rel="icon" href="assets/img/pearl-logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/theme.css">
+</head>
+<body>
+
+<!-- ═══════════ 1) شاشة التحميل ═══════════ -->
+<div id="view-loading" class="center-load">
+  <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series" style="height:84px;margin-inline:auto">
+  <span class="spinner"></span>
+  <p>جارٍ التحقق من الاشتراك…</p>
+</div>
+
+<!-- ═══════════ 2) شاشة تسجيل الدخول ═══════════ -->
+<main id="view-auth" class="auth-screen" hidden>
+  <div class="auth-card">
+    <div class="auth-hero">
+      <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series">
+      <h1>The Pearl Series</h1>
+      <p>Five Stars in English — <strong>Youssef Osman</strong></p>
+    </div>
+
+    <div class="auth-body">
+      <form id="login-form" novalidate>
+        <label class="field">
+          <span>البريد الإلكتروني المسجَّل لدينا</span>
+          <input id="login-email" class="input" type="email" dir="ltr"
+                 inputmode="email" autocomplete="email"
+                 placeholder="parent@example.com" required>
+        </label>
+        <button id="login-btn" class="btn btn-primary btn-block" type="submit">
+          إرسال رابط الدخول
+        </button>
+        <p class="hint">
+          سنرسل رابط دخول آمن إلى بريدك. لا حاجة لكلمة مرور.
+          الدخول متاح فقط للبريد المُفعَّل بعد الاشتراك.
+        </p>
+      </form>
+      <div id="login-msg" class="msg" hidden></div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════ 3) شاشة الرفض (بريد غير مفعّل / اشتراك منتهٍ) ═══════════ -->
+<main id="view-denied" class="auth-screen" hidden>
+  <div class="auth-card">
+    <div class="auth-hero">
+      <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series">
+      <h1>الدخول غير متاح</h1>
+      <p id="denied-email" class="mono" dir="ltr"></p>
+    </div>
+    <div class="auth-body">
+      <div id="denied-msg" class="msg msg-warn"></div>
+      <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+        <a id="denied-wa" class="btn btn-primary" target="_blank" rel="noopener">تواصل للاشتراك</a>
+        <button id="denied-logout" class="btn btn-ghost" type="button">تسجيل الخروج</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════ 4) الواجهة الرئيسية ═══════════ -->
+<div id="view-app" hidden>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <img src="assets/img/pearl-logo.jpg" alt="The Pearl Series">
+        <span class="brand-text">
+          <span class="brand-title">The Pearl Series</span>
+          <span class="brand-sub">Five Stars in English</span>
+        </span>
+      </div>
+      <span class="header-spacer"></span>
+      <div class="header-actions">
+        <span class="teacher-badge">Youssef Osman</span>
+        <a id="admin-link" class="btn btn-ghost btn-sm" href="admin/admin.html" hidden>لوحة الإدارة</a>
+        <button id="theme-btn" class="btn-icon" type="button" title="الوضع الليلي / النهاري" aria-label="تبديل المظهر">🌙</button>
+        <button id="logout-btn" class="btn btn-ghost btn-sm" type="button">خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h2 id="welcome">أهلًا بك 👋</h2>
+        <p id="welcome-sub">اختر القسم الذي تريد الدخول إليه.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b id="stat-open">0</b><span>أقسام مفتوحة</span></div>
+        <div class="stat"><b id="stat-days">—</b><span>أيام متبقية</span></div>
+      </div>
+    </section>
+
+    <div id="expiry-warn" class="msg msg-warn" hidden></div>
+
+    <div id="sections-root"></div>
+
+    <footer class="site-footer">
+      <p>© <span id="year"></span> <span class="sig">The Pearl Series</span> — جميع الحقوق محفوظة للأستاذ Youssef Osman</p>
+      <p style="font-size:.76rem">المحتوى مخصّص للمشتركين فقط. مشاركة الحساب تؤدي إلى إيقافه.</p>
+    </footer>
+  </main>
+</div>
+
+<!-- ═══════════ نافذة "قسم مقفول" ═══════════ -->
+<div id="lock-modal" class="modal-back" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+    <div class="modal-head"><h3 id="lock-title">🔒 هذا القسم غير مفتوح لك</h3></div>
+    <div class="modal-body">
+      <p id="lock-body" style="margin:0"></p>
+    </div>
+    <div class="modal-foot">
+      <button id="lock-close" class="btn btn-ghost" type="button">إغلاق</button>
+      <a id="lock-wa" class="btn btn-primary" target="_blank" rel="noopener">تواصل للاشتراك</a>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

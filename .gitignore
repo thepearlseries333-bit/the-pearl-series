@@ -1,0 +1,5 @@
+node_modules/
+.firebase/
+*-firebase-adminsdk-*.json
+.DS_Store
+Thumbs.db

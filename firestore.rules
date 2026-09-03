@@ -1,0 +1,90 @@
+rules_version = '2';
+
+/* ==========================================================================
+   The Pearl Series — قواعد أمان Firestore
+   --------------------------------------------------------------------------
+   هذا هو خط الدفاع الحقيقي للمنصة. حتى لو فتح أحدهم أدوات المطوّر وعدّل
+   جافاسكريبت، فالخادم هنا هو من يقرر ماذا يُسمح بقراءته.
+
+   القواعد باختصار:
+   • لا شيء مقروء لغير المسجّل دخوله.
+   • كل مشترك يقرأ مستنده هو فقط (members/{بريده}).
+   • مستندات content (التي تحوي المسار الحقيقي لملفات الأقسام) لا تُقرأ إلا
+     إذا كان الاشتراك: موجودًا + نشطًا + غير منتهٍ + هذا القسم ضمن صفوفه.
+   • الكتابة كلها للأدمن فقط (مجموعة admins تُدار من Firebase Console يدويًا).
+   ========================================================================== */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ---------------- دوال مساعدة ---------------- */
+    function signedIn() {
+      return request.auth != null && request.auth.token.email != null;
+    }
+    function myEmail() {
+      return request.auth.token.email.lower();
+    }
+    function isAdmin() {
+      return signedIn() &&
+             exists(/databases/$(database)/documents/admins/$(myEmail()));
+    }
+    function memberExists() {
+      return signedIn() &&
+             exists(/databases/$(database)/documents/members/$(myEmail()));
+    }
+    function me() {
+      return get(/databases/$(database)/documents/members/$(myEmail())).data;
+    }
+    /* اشتراك نشط وغير منتهٍ (التاريخ يُقارَن بوقت الخادم request.time) */
+    function activeMember() {
+      return memberExists()
+             && me().status == 'active'
+             && ( !('expiresAt' in me()) || me().expiresAt == null
+                  || me().expiresAt > request.time );
+    }
+    /* هل هذا القسم ضمن صفوف المشترك؟ ('*' تعني كل الأقسام */
+    function entitledTo(sectionId) {
+      return activeMember() && me().sections.hasAny(['*', sectionId]);
+    }
+
+    /* ---------------- المشتركون ---------------- */
+    /* معرّف المستند = البريد الإلكتروني بحروف صغيرة */
+    match /members/{memberEmail} {
+      allow read:  if isAdmin() || (signedIn() && myEmail() == memberEmail);
+      allow create, update, delete: if isAdmin();
+    }
+
+    /* ---------------- المشرفون ---------------- */
+    /* تُضاف يدويًا من Firebase Console فقط — لا كتابة من الموقع إطلاقًا */
+    match /admins/{adminEmail} {
+      allow read:  if signedIn() && (myEmail() == adminEmail || isAdmin());
+      allow write: if false;
+    }
+
+    /* ---------------- كتالوج الأقسام (أسماء فقط، بلا روابط) ---------------- */
+    match /sections/{sectionId} {
+      allow read:  if signedIn();
+      allow write: if isAdmin();
+    }
+
+    /* ---------------- روابط المحتوى الحقيقية (الأهم) ---------------- */
+    /* كل مستند: { url: "sections/p1-a7f3c2e9.html", title: "..." }        */
+    /* من ليس مشتركًا في القسم لا يستطيع حتى معرفة اسم الملف.               */
+    match /content/{sectionId} {
+      allow read:  if isAdmin() || entitledTo(sectionId);
+      allow write: if isAdmin();
+    }
+
+    /* ---------------- سجل عمليات الإدارة (اختياري) ---------------- */
+    match /audit/{logId} {
+      allow read:   if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    /* ---------------- أي شيء آخر: ممنوع ---------------- */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
