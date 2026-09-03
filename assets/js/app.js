@@ -4,8 +4,7 @@
 
 import { BRAND } from "../../firebase/firebase-config.js";
 import {
-  sendLoginLink, isLoginLink, completeLoginFromLink,
-  watchAuth, logout, authErrorAr, normalizeEmail
+  login, loginWithGoogle, watchAuth, logout, authErrorAr, normalizeEmail
 } from "../../firebase/auth.js";
 import {
   fetchMember, checkIsAdmin, evaluateMember, hasAccess,
@@ -47,42 +46,43 @@ const loginForm = $("#login-form");
 const loginMsg  = $("#login-msg");
 const loginBtn  = $("#login-btn");
 
+/* الدخول بحساب Google (الطريقة الأساسية) */
+const googleBtn = $("#google-btn");
+googleBtn.addEventListener("click", async () => {
+  const original = googleBtn.innerHTML;
+  googleBtn.disabled = true;
+  googleBtn.innerHTML = '<span class="spinner"></span> جارٍ فتح نافذة Google…';
+  try {
+    await loginWithGoogle();           // watchAuth يكمل الباقي
+  } catch (err) {
+    setMsg(loginMsg, authErrorAr(err), "err");
+  } finally {
+    googleBtn.disabled = false;
+    googleBtn.innerHTML = original;
+  }
+});
+
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = normalizeEmail($("#login-email").value);
+  const pass  = $("#login-pass").value;
   if (!email || !email.includes("@")) {
     return setMsg(loginMsg, "من فضلك اكتب بريدًا إلكترونيًا صحيحًا.", "err");
   }
+  if (!pass) return setMsg(loginMsg, "من فضلك اكتب كود الدخول.", "err");
+
   loginBtn.disabled = true;
-  loginBtn.innerHTML = '<span class="spinner"></span> جارٍ الإرسال…';
+  loginBtn.innerHTML = '<span class="spinner"></span> جارٍ الدخول…';
   try {
-    await sendLoginLink(email);
-    setMsg(loginMsg,
-      `تم إرسال رابط الدخول إلى <strong dir="ltr">${email}</strong>.<br>
-       افتح بريدك واضغط الرابط لإتمام الدخول.<br>
-       <small>لو لم تجد الرسالة، راجع مجلد <strong>Spam / البريد غير المرغوب</strong>.</small>`, "ok");
-    loginForm.reset();
+    await login(email, pass);          // watchAuth يكمل الباقي
+    $("#login-pass").value = "";
   } catch (err) {
     setMsg(loginMsg, authErrorAr(err), "err");
   } finally {
     loginBtn.disabled = false;
-    loginBtn.textContent = "إرسال رابط الدخول";
+    loginBtn.textContent = "دخول";
   }
 });
-
-/* إكمال الدخول إذا كان المستخدم قادمًا من رابط البريد */
-async function handleIncomingLink() {
-  if (!isLoginLink()) return false;
-  show("view-loading");
-  try {
-    await completeLoginFromLink(() => prompt("للتأكيد، اكتب بريدك الإلكتروني:"));
-    return true;                       // watchAuth سيكمل الباقي
-  } catch (err) {
-    show("view-auth");
-    setMsg(loginMsg, authErrorAr(err), "err");
-    return false;
-  }
-}
 
 /* ========================= 2) الحارس ========================= */
 let CURRENT = { user: null, member: null, evalRes: null, isAdmin: false, catalog: [] };
@@ -215,4 +215,4 @@ lockModal.addEventListener("click", (e) => { if (e.target === lockModal) lockMod
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") lockModal.hidden = true; });
 
 /* ========================= بدء التشغيل ========================= */
-handleIncomingLink();
+/* لا شيء يُنفَّذ عند التحميل: watchAuth يقرر أي شاشة تظهر. */
