@@ -125,6 +125,13 @@
           <input id="f-phone" class="input" type="tel" dir="ltr" placeholder="010xxxxxxxx"></label>
       </div>
       <div class="row2">
+        <label class="field"><span>كود الدخول (كلمة المرور) *</span>
+          <input id="f-code" class="input mono" type="text" dir="ltr" placeholder="8 خانات على الأقل">
+          <span class="hint" id="code-hint">يُنشأ الحساب بهذا الكود عند الحفظ — أرسله لولي الأمر مع بريده.</span></label>
+        <label class="field"><span style="visibility:hidden">.</span>
+          <button type="button" id="gen-code" class="btn btn-ghost btn-block">🎲 توليد كود</button></label>
+      </div>
+      <div class="row2">
         <label class="field"><span>الحالة</span>
           <select id="f-status" class="input">
             <option value="active">نشط</option>

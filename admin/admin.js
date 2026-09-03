@@ -7,7 +7,8 @@
    ========================================================================== */
 
 import { db } from "../firebase/firebase-config.js";
-import { watchAuth, logout, normalizeEmail } from "../firebase/auth.js";
+import { watchAuth, logout, normalizeEmail, createMemberAccount, generateCode } from "../firebase/auth.js";
+import { BRAND } from "../firebase/firebase-config.js";
 import { checkIsAdmin, toDate, fetchCatalog } from "../firebase/access-control.js";
 import {
   collection, getDocs, doc, setDoc, deleteDoc, getDoc,
@@ -176,6 +177,12 @@ function openMember(id) {
   $("#f-email").disabled = !!id;
 
   const m = id ? MEMBERS.find(x => x.id === id) : null;
+  /* كود الدخول يُحدَّد مرة واحدة عند الإنشاء (تغييره لاحقًا يحتاج Firebase Console) */
+  $("#f-code").value    = id ? (m.accessCode || "") : generateCode();
+  $("#f-code").disabled = !!id;
+  $("#code-hint").textContent = id
+    ? "لا يمكن تغيير الكود من هنا — من Firebase Console → Authentication."
+    : "يُنشأ الحساب بهذا الكود عند الحفظ — أرسله لولي الأمر مع بريده.";
   $("#f-email").value  = m ? m.id : "";
   $("#f-name").value   = (m && m.name)  || "";
   $("#f-phone").value  = (m && m.phone) || "";
@@ -201,6 +208,10 @@ $("#member-form").addEventListener("submit", async (e) => {
   const allOn = secs.length === CATALOG.length && CATALOG.length > 0;
   if (!secs.length) return setMsg($("#form-msg"), "اختر قسمًا واحدًا على الأقل.", "err");
 
+  const code = $("#f-code").value.trim();
+  if (!EDITING && code.length < 6)
+    return setMsg($("#form-msg"), "كود الدخول يجب أن يكون 6 خانات على الأقل.", "err");
+
   const expVal = $("#f-expires").value;
   const payload = {
     name:   $("#f-name").value.trim(),
@@ -219,12 +230,28 @@ $("#member-form").addEventListener("submit", async (e) => {
     if (!EDITING) {
       const exists = await getDoc(doc(db, "members", email));
       if (exists.exists()) throw new Error("duplicate");
+      await createMemberAccount(email, code);   // إنشاء حساب الدخول
+      payload.accessCode = code;                // نحتفظ به لتذكير ولي الأمر
     }
     await setDoc(doc(db, "members", email), payload, { merge: true });
     mModal.hidden = true;
     await loadMembers();
-    setMsg($("#admin-msg"), `✅ تم حفظ <span class="mono" dir="ltr">${email}</span>.`, "ok");
-    setTimeout(() => hide($("#admin-msg")), 4000);
+
+    if (!EDITING) {
+      const msg = `أهلًا بك في منصة The Pearl Series 🌟
+رابط المنصة: ${location.origin}${location.pathname.replace(/admin\/.*$/, "")}
+البريد: ${email}
+كود الدخول: ${code}
+أ/ ${BRAND.teacher}`;
+      setMsg($("#admin-msg"),
+        `✅ تم إنشاء حساب <span class="mono" dir="ltr">${email}</span> — كود الدخول:
+         <strong class="mono">${code}</strong>
+         <a class="btn btn-primary btn-sm" style="margin-inline-start:10px" target="_blank" rel="noopener"
+            href="https://wa.me/?text=${encodeURIComponent(msg)}">إرسال البيانات على واتساب</a>`, "ok");
+    } else {
+      setMsg($("#admin-msg"), `✅ تم حفظ <span class="mono" dir="ltr">${email}</span>.`, "ok");
+      setTimeout(() => hide($("#admin-msg")), 4000);
+    }
   } catch (err) {
     setMsg($("#form-msg"),
       err.message === "duplicate" ? "هذا البريد مضاف بالفعل — استخدم «تعديل»."
