@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>التأسيس — The Pearl Series</title>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     نموذج دمج قسم تفاعلي في المنصة.
+     السطران التاليان هما كل ما تحتاج إضافته لأي ملف قسم عندك:
+       1) style يخفي الصفحة مؤقتًا حتى يتم التحقق.
+       2) script الحارس، مع data-section = معرّف القسم في المنصة.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style id="pearl-guard-style">body{visibility:hidden}</style>
+<script type="module" src="../assets/js/section-guard.js" data-section="found"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#123A70;--navy2:#1B4C90;--pearl:#F6F4EF;--ink:#101418;--muted:#5A6472;--gold:#C9A227}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--pearl);color:var(--ink);font-family:Cairo,Segoe UI,Tahoma,sans-serif;
+       background-image:radial-gradient(900px 420px at 12% -10%,rgba(18,58,112,.10),transparent 60%)}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:20px;
+         display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header img{height:44px;background:#fff;border-radius:8px;padding:4px 6px}
+  header h1{margin:0;font-size:1.15rem}
+  header .sp{flex:1}
+  header a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.45);
+           padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:700}
+  main{width:min(900px,92vw);margin:28px auto}
+  .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .letter{background:#fff;border:1px solid rgba(18,58,112,.14);border-radius:20px;padding:22px 16px;
+          text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(7,24,47,.05);
+          transition:transform .2s,box-shadow .2s}
+  .letter:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(7,24,47,.10)}
+  .letter b{display:block;font-family:Poppins,sans-serif;font-size:2.4rem;color:var(--navy);line-height:1.1}
+  .letter span{font-size:.85rem;color:var(--muted)}
+  h2{color:var(--navy);font-size:1.1rem;margin:30px 0 12px}
+  .quiz{background:#fff;border:1px solid rgba(18,58,112,.14);border-radius:20px;padding:22px}
+  .quiz input{padding:11px 14px;border-radius:14px;border:1px solid rgba(18,58,112,.28);
+              font:inherit;width:200px;text-align:left;direction:ltr}
+  .quiz button{background:var(--navy);color:#fff;border:0;padding:11px 22px;border-radius:999px;
+               font-weight:700;cursor:pointer;font-family:inherit}
+  .fb{margin-top:12px;font-weight:700}
+  .ok{color:#1E8E5A}.no{color:#B23B3B}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:30px 12px}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="../assets/img/pearl-logo.jpg" alt="The Pearl Series">
+  <h1>قسم التأسيس — Foundation</h1>
+  <span class="sp"></span>
+  <a href="../index.html">← الرجوع للمنصة</a>
+</header>
+
+<main>
+  <h2>اضغط على أي حرف لتسمع نطقه 🔊</h2>
+  <div class="cards" id="letters"></div>
+
+  <h2>تدريب: اكتب الحرف الذي سمعته</h2>
+  <div class="quiz">
+    <button id="play">🔊 اسمع الحرف</button>
+    <input id="ans" placeholder="اكتب الحرف" maxlength="3" autocomplete="off">
+    <button id="check">تحقق</button>
+    <div id="fb" class="fb"></div>
+  </div>
+</main>
+
+<footer>The Pearl Series — Youssef Osman</footer>
+
+<script>
+/* ---- النطق عبر Web Speech API (مجاني، بدون خدمات خارجية) ---- */
+function say(text){
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US"; u.rate = .85;
+    speechSynthesis.speak(u);
+  }catch(e){ console.warn("Speech not supported", e); }
+}
+
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+document.getElementById("letters").innerHTML =
+  LETTERS.map(l => `<button class="letter" data-l="${l}"><b>${l}</b><span>${l.toLowerCase()}</span></button>`).join("");
+document.querySelectorAll(".letter").forEach(b => b.onclick = () => say(b.dataset.l));
+
+/* ---- تدريب بسيط: يقبل أكثر من صيغة صحيحة (كبير/صغير/بفراغات) ---- */
+let target = null;
+document.getElementById("play").onclick = () => {
+  target = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+  say(target);
+  document.getElementById("fb").textContent = "";
+  document.getElementById("ans").value = "";
+  document.getElementById("ans").focus();
+};
+document.getElementById("check").onclick = () => {
+  const fb = document.getElementById("fb");
+  if (!target) { fb.textContent = "اضغط «اسمع الحرف» أولًا."; fb.className = "fb"; return; }
+  const v = document.getElementById("ans").value.trim().toLowerCase();
+  const accepted = [target.toLowerCase(), target.toLowerCase() + ".", "letter " + target.toLowerCase()];
+  if (accepted.includes(v)) { fb.textContent = "✅ ممتاز! الحرف هو " + target; fb.className = "fb ok"; }
+  else { fb.textContent = "❌ حاول مرة أخرى — استمع مرة ثانية."; fb.className = "fb no"; }
+};
+document.getElementById("ans").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("check").click();
+});
+</script>
+</body>
+</html>
