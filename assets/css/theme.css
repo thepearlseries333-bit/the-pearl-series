@@ -182,6 +182,28 @@ button{font:inherit}
 .input[dir="ltr"]{text-align:left}
 .hint{font-size:.78rem;color:var(--text-muted);margin-top:6px}
 
+/* زر Google + الفاصل + صندوق الكود */
+.btn-google{
+  background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);box-shadow:var(--shadow-sm);
+  padding:13px 20px;font-size:.98rem;
+}
+.btn-google:hover{background:var(--surface-2);box-shadow:var(--shadow-md)}
+.btn-google svg{flex:none}
+
+.or{display:flex;align-items:center;gap:12px;margin:18px 0 14px;color:var(--text-muted);font-size:.78rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--border)}
+
+.code-box{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface-2)}
+.code-box summary{
+  cursor:pointer;padding:11px 14px;font-size:.85rem;font-weight:700;color:var(--brand);
+  list-style:none;user-select:none;
+}
+.code-box summary::-webkit-details-marker{display:none}
+.code-box summary::before{content:"▾ ";display:inline-block;transition:transform var(--tr)}
+.code-box[open] summary::before{transform:rotate(180deg)}
+.code-box form{padding:2px 14px 16px}
+
 .msg{
   margin-top:14px;padding:12px 14px;border-radius:var(--r-md);
   font-size:.88rem;border:1px solid transparent;
