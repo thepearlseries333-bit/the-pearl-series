@@ -291,16 +291,67 @@ async function renewMember(id, days) {
 /* ========================= مودال روابط الأقسام ========================= */
 const cModal = $("#content-modal");
 
+/* بناء صف مسار واحد (اسم + ملف + حذف) */
+function trackRow(secId, track = {}) {
+  const row = document.createElement("div");
+  row.className = "track-row";
+  row.dataset.sec = secId;
+  row.innerHTML = `
+    <input class="input t-title" type="text" placeholder="اسم المسار (مثال: الكتاب الأول)"
+           value="${(track.title || "").replace(/"/g, "&quot;")}">
+    <input class="input mono t-url" type="text" dir="ltr" placeholder="sections/${secId}-XXXXXX.html"
+           value="${(track.url || track.path || "").replace(/"/g, "&quot;")}">
+    <button type="button" class="track-del" title="حذف المسار">✕</button>`;
+  row.querySelector(".track-del").onclick = () => {
+    const box = row.closest(".sec-box");
+    row.remove();
+    refreshCount(box);
+  };
+  return row;
+}
+
+function refreshCount(box) {
+  const n = box.querySelectorAll(".track-row").length;
+  const badge = box.querySelector(".sec-count");
+  badge.textContent = n ? `${n} مسار` : "لا يوجد";
+  badge.classList.toggle("zero", n === 0);
+}
+
 $("#btn-content").onclick = async () => {
   hide($("#content-msg"));
   const snap = await getDocs(collection(db, "content"));
-  const map = {}; snap.docs.forEach(d => map[d.id] = (d.data().url || d.data().path || ""));
-  $("#content-list").innerHTML = CATALOG.map(s => `
-    <label class="field" style="margin-bottom:12px">
-      <span>${s.ar} <small class="mono">(${s.id})</small></span>
-      <input class="input mono" dir="ltr" data-content="${s.id}"
-             value="${map[s.id] || ""}" placeholder="sections/${s.id}-XXXXXX.html">
-    </label>`).join("");
+  const map = {};
+  snap.docs.forEach(d => {
+    const data = d.data();
+    let tracks = Array.isArray(data.tracks) ? data.tracks.filter(t => t && (t.url || t.path)) : [];
+    if (!tracks.length && (data.url || data.path))          // ترقية الشكل القديم تلقائيًا
+      tracks = [{ id: "main", title: "المحتوى", url: data.url || data.path }];
+    map[d.id] = tracks;
+  });
+
+  const list = $("#content-list");
+  list.innerHTML = "";
+  CATALOG.forEach(s => {
+    const box = document.createElement("details");
+    box.className = "sec-box";
+    box.dataset.sec = s.id;
+    box.innerHTML = `
+      <summary>${s.ar} <small class="mono" style="color:var(--text-muted)">(${s.id})</small>
+        <span class="sec-count zero">لا يوجد</span></summary>
+      <div class="sec-body">
+        <div class="rows"></div>
+        <button type="button" class="btn btn-ghost btn-sm add-track">+ إضافة مسار</button>
+      </div>`;
+    const rows = box.querySelector(".rows");
+    (map[s.id] || []).forEach(t => rows.appendChild(trackRow(s.id, t)));
+    box.querySelector(".add-track").onclick = () => {
+      rows.appendChild(trackRow(s.id));
+      refreshCount(box);
+      box.open = true;
+    };
+    refreshCount(box);
+    list.appendChild(box);
+  });
   cModal.hidden = false;
 };
 $("#content-close").onclick = () => cModal.hidden = true;
@@ -311,17 +362,29 @@ $("#content-save").onclick = async () => {
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> حفظ…';
   try {
     const batch = writeBatch(db);
-    $$("[data-content]").forEach(inp => {
-      const url = inp.value.trim();
-      if (url) batch.set(doc(db, "content", inp.dataset.content),
-        { url, updatedAt: serverTimestamp() }, { merge: true });
+    let total = 0, sections = 0;
+
+    $$(".sec-box").forEach(box => {
+      const secId  = box.dataset.sec;
+      const tracks = [];
+      box.querySelectorAll(".track-row").forEach((row, i) => {
+        const title = row.querySelector(".t-title").value.trim();
+        const url   = row.querySelector(".t-url").value.trim();
+        if (!url) return;                                   // صف بلا ملف = يُتجاهل
+        tracks.push({ id: "t" + (i + 1), title: title || `مسار ${i + 1}`, url });
+      });
+      if (tracks.length) { total += tracks.length; sections++; }
+      batch.set(doc(db, "content", secId),
+        { tracks, url: null, path: null, updatedAt: serverTimestamp() }, { merge: true });
     });
+
     await batch.commit();
-    setMsg($("#content-msg"), "✅ تم حفظ روابط الأقسام.", "ok");
+    setMsg($("#content-msg"),
+      `✅ تم الحفظ: <strong>${total}</strong> مسار في <strong>${sections}</strong> قسم.`, "ok");
   } catch (err) {
     setMsg($("#content-msg"), "تعذّر الحفظ: " + (err.code || err.message), "err");
   } finally {
-    btn.disabled = false; btn.textContent = "حفظ الروابط";
+    btn.disabled = false; btn.textContent = "حفظ المسارات";
   }
 };
 
