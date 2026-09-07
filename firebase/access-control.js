@@ -79,13 +79,33 @@ export async function fetchCatalog() {
 }
 
 /**
- * الحصول على الرابط الحقيقي لملف القسم.
- * مستند content/{sectionId} محمي بالقواعد؛ إن لم تكن مشتركًا سترجع Firestore
- * خطأ permission-denied ولن يصلك المسار أبدًا.
+ * مسارات القسم (الكتب/الموضوعات داخل الصف الواحد).
+ *
+ * مستند content/{sectionId} محمي بالقواعد؛ إن لم تكن مشتركًا في هذا القسم
+ * سترجع Firestore خطأ permission-denied ولن تصلك المسارات أبدًا.
+ *
+ * شكل المستند:
+ *   content/p1 = { tracks: [ {id, title, url, desc}, ... ] }
+ * ويُدعَم الشكل القديم (رابط واحد) تلقائيًا: { url: "sections/p1-x.html" }
  */
-export async function resolveSectionUrl(sectionId) {
+export async function fetchSectionTracks(sectionId) {
   const snap = await getDoc(doc(db, "content", sectionId));
   if (!snap.exists()) throw new Error("not-published");
   const data = snap.data();
-  return data.url || data.path;   // مثال: "sections/p1-a7f3c2e9.html"
+
+  let list = Array.isArray(data.tracks) ? data.tracks : [];
+  list = list.filter(t => t && (t.url || t.path));
+
+  if (!list.length) {                       // توافق مع الشكل القديم
+    const legacy = data.url || data.path;
+    if (legacy) list = [{ id: "main", title: "المحتوى", url: legacy }];
+  }
+  if (!list.length) throw new Error("not-published");
+
+  return list.map((t, i) => ({
+    id:    t.id    || ("t" + (i + 1)),
+    title: t.title || ("مسار " + (i + 1)),
+    desc:  t.desc  || "",
+    url:   t.url   || t.path
+  }));
 }
