@@ -8,7 +8,7 @@ import {
 } from "../../firebase/auth.js";
 import {
   fetchMember, checkIsAdmin, evaluateMember, hasAccess,
-  fetchCatalog, resolveSectionUrl
+  fetchCatalog, fetchSectionTracks
 } from "../../firebase/access-control.js";
 import { GROUPS } from "./catalog.js";
 
@@ -182,14 +182,15 @@ function makeTile(sec, unlocked) {
   return el;
 }
 
-/* فتح القسم: نطلب المسار الحقيقي من Firestore (محمي بالقواعد) */
+/* فتح القسم: نطلب مسارات القسم من Firestore (محمية بالقواعد) */
 async function openSection(sec, el) {
   const cta = el.querySelector(".tile-cta");
   const old = cta.textContent;
   cta.innerHTML = '<span class="spinner" style="width:14px;height:14px"></span> جارٍ الفتح…';
   try {
-    const url = await resolveSectionUrl(sec.id);
-    window.open(url, "_blank", "noopener");
+    const tracks = await fetchSectionTracks(sec.id);
+    if (tracks.length === 1) window.open(tracks[0].url, "_blank", "noopener");
+    else showTracks(sec, tracks);
   } catch (err) {
     if (err.message === "not-published") {
       showLock(sec, "هذا القسم قيد الرفع وسيتاح قريبًا بإذن الله.");
@@ -200,6 +201,37 @@ async function openSection(sec, el) {
     cta.textContent = old;
   }
 }
+
+/* ---------- نافذة اختيار المسار داخل الصف ---------- */
+const tracksModal = $("#tracks-modal");
+
+function showTracks(sec, tracks) {
+  $("#tracks-title").textContent = `${sec.ar} — اختر ما تريد فتحه`;
+  const body = $("#tracks-body");
+  body.innerHTML = "";
+
+  tracks.forEach((t, i) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "track-item";
+    item.innerHTML = `
+      <span class="track-num">${i + 1}</span>
+      <span class="track-text">
+        <strong>${t.title}</strong>
+        ${t.desc ? `<small>${t.desc}</small>` : ""}
+      </span>
+      <span class="track-go">افتح ←</span>`;
+    item.addEventListener("click", () => {
+      window.open(t.url, "_blank", "noopener");
+      tracksModal.hidden = true;
+    });
+    body.appendChild(item);
+  });
+  tracksModal.hidden = false;
+}
+
+$("#tracks-close").addEventListener("click", () => tracksModal.hidden = true);
+tracksModal.addEventListener("click", (e) => { if (e.target === tracksModal) tracksModal.hidden = true; });
 
 /* ---------- نافذة القفل ---------- */
 const lockModal = $("#lock-modal");
@@ -212,7 +244,9 @@ function showLock(sec, customText) {
 }
 $("#lock-close").addEventListener("click", () => lockModal.hidden = true);
 lockModal.addEventListener("click", (e) => { if (e.target === lockModal) lockModal.hidden = true; });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") lockModal.hidden = true; });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { lockModal.hidden = true; tracksModal.hidden = true; }
+});
 
 /* ========================= بدء التشغيل ========================= */
 /* لا شيء يُنفَّذ عند التحميل: watchAuth يقرر أي شاشة تظهر. */
