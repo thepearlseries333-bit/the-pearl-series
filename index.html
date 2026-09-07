@@ -71,7 +71,7 @@
 
       <p class="hint" style="text-align:center;margin-top:18px">
         لست مشتركًا بعد؟
-        <a href="packages.html"><strong>شاهد الباقات والأسعار ←</strong></a>
+        <a href="packages.html"><strong>طريقة الاشتراك ←</strong></a>
       </p>
       <div id="login-msg" class="msg" hidden></div>
     </div>
@@ -90,7 +90,7 @@
       <div id="denied-msg" class="msg msg-warn"></div>
       <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
         <a id="denied-wa" class="btn btn-primary" target="_blank" rel="noopener">تواصل للاشتراك</a>
-        <a class="btn btn-ghost" href="packages.html">الباقات والأسعار</a>
+        <a class="btn btn-ghost" href="packages.html">طريقة الاشتراك</a>
         <button id="denied-logout" class="btn btn-ghost" type="button">تسجيل الخروج</button>
       </div>
     </div>
@@ -139,6 +139,19 @@
       <p style="font-size:.76rem">المحتوى مخصّص للمشتركين فقط. مشاركة الحساب تؤدي إلى إيقافه.</p>
     </footer>
   </main>
+</div>
+
+<!-- ═══════════ نافذة اختيار المسار داخل الصف ═══════════ -->
+<div id="tracks-modal" class="modal-back" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tracks-title">
+    <div class="modal-head"><h3 id="tracks-title">اختر المسار</h3></div>
+    <div class="modal-body">
+      <div id="tracks-body" class="tracks-list"></div>
+    </div>
+    <div class="modal-foot">
+      <button id="tracks-close" class="btn btn-ghost" type="button">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════ نافذة "قسم مقفول" ═══════════ -->
