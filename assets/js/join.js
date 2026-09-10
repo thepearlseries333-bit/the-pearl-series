@@ -100,29 +100,51 @@ function updateTotal() {
 }
 
 /* ---------- إرسال الطلب ---------- */
+const IPA = "mr.youssefosman17880@instapay";
+
+$("#copy-ipa").addEventListener("click", async () => {
+  const btn = $("#copy-ipa");
+  try { await navigator.clipboard.writeText(IPA); }
+  catch {
+    const r = document.createRange(); r.selectNode($("#pay-ipa"));
+    getSelection().removeAllRanges(); getSelection().addRange(r);
+    try { document.execCommand("copy"); } catch {}
+  }
+  btn.textContent = "✓ تم النسخ";
+  setTimeout(() => btn.textContent = "نسخ", 2000);
+});
+
 $("#join-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name  = $("#f-name").value.trim();
-  const phone = $("#f-phone").value.trim();
-  const ids   = picked();
-  const note  = $("#f-note").value.trim();
+  const name   = $("#f-name").value.trim();
+  const parent = $("#f-parent").value.trim();
+  const school = $("#f-school").value.trim();
+  const phone  = $("#f-phone").value.trim();
+  const ids    = picked();
+  const note   = $("#f-note").value.trim();
 
-  if (name.length < 3)  return setMsg($("#form-msg"), "اكتب اسم الطالب كاملًا.", "err");
-  if (phone.length < 8) return setMsg($("#form-msg"), "اكتب رقم واتساب صحيحًا.", "err");
-  if (!ids.length)      return setMsg($("#form-msg"), "اختر صفًا واحدًا على الأقل.", "err");
+  if (name.length < 3)   return setMsg($("#form-msg"), "اكتب اسم الطالب كاملًا.", "err");
+  if (parent.length < 3) return setMsg($("#form-msg"), "اكتب اسم ولي الأمر.", "err");
+  if (phone.length < 8)  return setMsg($("#form-msg"), "اكتب رقم واتساب صحيحًا.", "err");
+  if (!ids.length)       return setMsg($("#form-msg"), "اختر صفًا واحدًا على الأقل.", "err");
 
   const btn = $("#send-btn");
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> جارٍ الإرسال…';
   try {
     const total = priceOf(PRICING, ids);
-    await submitRequest({ email: normalizeEmail(USER.email), name, phone, sections: ids, note, total });
+    await submitRequest({ email: normalizeEmail(USER.email), name, parent, school,
+                          phone, sections: ids, note, total });
 
+    const cur   = PRICING.currency || "جنيه";
     const names = ids.map(id => (CATALOG.find(c => c.id === id) || {}).ar || id).join("، ");
     const txt = `السلام عليكم أ/ ${BRAND.teacher}\nأرسلت طلب اشتراك من المنصة:\n` +
-                `الاسم: ${name}\nالبريد: ${normalizeEmail(USER.email)}\nالصفوف: ${names}\n` +
-                (total ? `الإجمالي: ${total}\n` : "");
+                `الطالب: ${name}\nولي الأمر: ${parent}\n` + (school ? `المدرسة: ${school}\n` : "") +
+                `البريد: ${normalizeEmail(USER.email)}\nالصفوف: ${names}\n` +
+                (total ? `الإجمالي: ${total} ${cur}\n` : "") +
+                `\nمرفق إيصال التحويل على إنستاباي.`;
     $("#done-wa").href = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(txt)}`;
+    $("#pay-amount").textContent = total ? money(total) + " " + cur : "المبلغ حسب الاتفاق";
     show("step-done");
   } catch (err) {
     setMsg($("#form-msg"), "تعذّر الإرسال: " + (err.code || err.message) +
