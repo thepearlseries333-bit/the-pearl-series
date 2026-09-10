@@ -240,16 +240,41 @@ const viewerFrame = $("#viewer-frame");
 const viewerLoad  = $(".viewer-load");
 let viewerOpen = false;
 
+let viewerTimer = null;
+
+/* روابط لا يمكن عرضها داخل إطار (github.com يمنع ذلك صراحةً) */
+function embeddable(url) {
+  return !/^https?:\/\/(www\.)?(github\.com|drive\.google\.com\/file)/i.test(url || "");
+}
+
+function viewerFallback(track, why) {
+  clearTimeout(viewerTimer);
+  viewerLoad.hidden = true;
+  $("#viewer-fallback").hidden = false;
+  $("#viewer-why").textContent = why;
+  $("#viewer-open-new").href = track.url;
+}
+
 function openViewer(track, sec) {
   $("#viewer-title").textContent = track.title || sec.ar;
   $("#viewer-sub").textContent   = sec.ar || "";
+  $("#viewer-fallback").hidden = true;
   viewerLoad.hidden = false;
-  viewerFrame.src = track.url;
   viewer.hidden = false;
   document.body.classList.add("viewing");
   viewerOpen = true;
-  // زر الرجوع في الهاتف يغلق العارض بدل الخروج من المنصة
-  history.pushState({ pearlViewer: true }, "");
+  history.pushState({ pearlViewer: true }, "");   // زر الرجوع يغلق العارض
+
+  if (!embeddable(track.url)) {
+    viewerFrame.src = "about:blank";
+    viewerFallback(track, "هذا الرابط يمنع عرضه داخل المنصة (صفحة مستودع GitHub). الحل: فعّل GitHub Pages لهذا المستودع واستخدم رابط الصفحة، أو ارفع الملف داخل مجلد sections.");
+    return;
+  }
+  viewerFrame.src = track.url;
+  clearTimeout(viewerTimer);
+  viewerTimer = setTimeout(() => {
+    if (!viewerLoad.hidden) viewerFallback(track, "تأخّر تحميل الدرس أو رفض الموقع عرضه داخل إطار.");
+  }, 9000);
 }
 
 function closeViewer(fromPop) {
@@ -261,7 +286,7 @@ function closeViewer(fromPop) {
   if (!fromPop && history.state && history.state.pearlViewer) history.back();
 }
 
-viewerFrame.addEventListener("load", () => { viewerLoad.hidden = true; });
+viewerFrame.addEventListener("load", () => { viewerLoad.hidden = true; clearTimeout(viewerTimer); });
 $("#viewer-back").addEventListener("click", () => closeViewer(false));
 $("#viewer-reload").addEventListener("click", () => {
   viewerLoad.hidden = false;
