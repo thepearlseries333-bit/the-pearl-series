@@ -514,6 +514,32 @@ body.viewing{overflow:hidden}
 }
 .total-box strong{font-size:1.25rem;font-family:var(--font-en)}
 
+/* ============ صندوق الدفع (إنستاباي) ============ */
+.pay-box{
+  margin-top:6px;padding:20px 18px;border-radius:var(--r-lg);
+  background:var(--surface-2);border:1px dashed var(--border-strong);text-align:center;
+}
+.pay-head{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.pay-logo{
+  font-family:var(--font-en);font-weight:700;font-size:.82rem;letter-spacing:.5px;
+  background:#4B2E83;color:#fff;padding:5px 13px;border-radius:var(--r-full);
+}
+.pay-head strong{font-size:1.3rem;font-family:var(--font-en);color:var(--ok)}
+.pay-qr{
+  width:min(230px,70%);margin:0 auto 14px;border-radius:var(--r-md);
+  background:#fff;padding:8px;border:1px solid var(--border);
+}
+.pay-label{font-size:.85rem;color:var(--text-muted);margin:0 0 8px}
+.pay-addr{
+  display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:var(--r-md);padding:10px 12px;
+}
+.pay-addr code{
+  font-family:ui-monospace,Consolas,monospace;font-size:.86rem;font-weight:700;
+  color:var(--brand);word-break:break-all;
+}
+
 /* ============ طلبات الاشتراك في لوحة الإدارة ============ */
 .req-card{
   display:flex;gap:14px;align-items:flex-start;padding:16px;margin-bottom:12px;
