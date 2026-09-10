@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/img/pearl-logo.jpg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/theme.css?v=7">
+<link rel="stylesheet" href="assets/css/theme.css?v=8">
 </head>
 <body>
 
@@ -71,6 +71,12 @@
         <div class="row2">
           <label class="field"><span>اسم الطالب *</span>
             <input id="f-name" class="input" type="text" placeholder="مثال: أحمد محمد" required></label>
+          <label class="field"><span>اسم ولي الأمر *</span>
+            <input id="f-parent" class="input" type="text" placeholder="مثال: محمد عبد الله" required></label>
+        </div>
+        <div class="row2">
+          <label class="field"><span>المدرسة</span>
+            <input id="f-school" class="input" type="text" placeholder="مثال: مدرسة النيل الخاصة"></label>
           <label class="field"><span>رقم الواتساب *</span>
             <input id="f-phone" class="input" type="tel" dir="ltr" inputmode="tel"
                    placeholder="01xxxxxxxxx" required></label>
@@ -109,10 +115,30 @@
       <span style="font-size:2.6rem;display:block;margin-bottom:8px">✅</span>
       <h2 style="margin:0 0 8px;font-size:1.25rem">تم إرسال طلبك بنجاح</h2>
       <p style="color:var(--text-muted);margin:0 0 18px">
-        وصل الطلب للوحة إدارة الأستاذ. للتعجيل، أرسل لنا رسالة على الواتساب مع إيصال الدفع.
+        باقية خطوة واحدة: حوِّل المبلغ على <strong>إنستاباي</strong>، ثم أرسل صورة الإيصال
+        على الواتساب ليُفعَّل حسابك.
       </p>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <a id="done-wa" class="btn btn-primary" target="_blank" rel="noopener">تأكيد على الواتساب</a>
+
+      <!-- ═══ الدفع عبر إنستاباي ═══ -->
+      <div class="pay-box">
+        <div class="pay-head">
+          <span class="pay-logo">InstaPay</span>
+          <strong id="pay-amount">—</strong>
+        </div>
+        <img class="pay-qr" src="assets/img/instapay-qr.png" alt="كود إنستاباي"
+             onerror="this.style.display='none'">
+        <p class="pay-label">حوِّل إلى عنوان إنستاباي التالي</p>
+        <div class="pay-addr">
+          <code id="pay-ipa" dir="ltr">mr.youssefosman17880@instapay</code>
+          <button id="copy-ipa" class="btn btn-ghost btn-sm" type="button">نسخ</button>
+        </div>
+        <p class="hint" style="margin-top:10px">
+          افتح تطبيق البنك أو إنستاباي ← تحويل ← إلى عنوان إنستاباي ← الصق العنوان.
+        </p>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+        <a id="done-wa" class="btn btn-primary" target="_blank" rel="noopener">إرسال الإيصال على الواتساب</a>
         <a class="btn btn-ghost" href="index.html">الرجوع للمنصة</a>
       </div>
     </div>
@@ -123,6 +149,6 @@
   </footer>
 </main>
 
-<script type="module" src="assets/js/join.js?v=7"></script>
+<script type="module" src="assets/js/join.js?v=8"></script>
 </body>
 </html>
