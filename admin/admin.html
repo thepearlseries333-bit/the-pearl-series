@@ -7,7 +7,7 @@
 <link rel="icon" href="../assets/img/pearl-logo.jpg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/theme.css?v=5">
+<link rel="stylesheet" href="../assets/css/theme.css?v=6">
 </head>
 <body>
 
@@ -78,7 +78,7 @@
         <option value="suspended">موقوف</option>
       </select>
       <button id="btn-add" class="btn btn-primary">+ إضافة مشترك</button>
-      <button id="btn-content" class="btn btn-ghost">مسارات الأقسام</button>
+      <button id="btn-content" class="btn btn-ghost">محتوى الأقسام</button>
       <button id="btn-refresh" class="btn btn-ghost" title="تحديث">↻</button>
     </div>
 
@@ -171,27 +171,36 @@
 
 <!-- ═══ مودال روابط الأقسام ═══ -->
 <div id="content-modal" class="modal-back" hidden>
-  <div class="modal">
-    <div class="modal-head"><h3>مسارات الأقسام (الكتب والموضوعات)</h3></div>
+  <div class="modal modal-lg">
+    <div class="modal-head"><h3>محتوى الأقسام — تِرم ← مسار ← وحدة</h3></div>
     <div class="modal-body">
       <div class="msg msg-info" style="margin-top:0">
-        كل صف يمكن أن يحتوي <strong>أكثر من مسار</strong> (كتاب، قواعد، امتحانات… إلخ).
-        اكتب لكل مسار <strong>اسمًا</strong> يظهر للطالب و<strong>مسار الملف</strong> مثل:
-        <span class="mono" dir="ltr">sections/p1-book1-a7f3c2.html</span><br>
-        الطالب يرى قائمة المسارات عند دخول الصف؛ ولو المسار واحد يُفتح مباشرة.<br>
-        <strong>نصيحة أمنية:</strong> اجعل اسم الملف يحتوي رمزًا عشوائيًا حتى لا يخمّنه أحد —
-        هذه المسارات لا يقرأها إلا المشترك في هذا القسم.
+        اختر الصف، ثم أضِف <strong>التِرمات</strong>، وداخل كل تِرم <strong>المسارات</strong>
+        (Listening / Reading / Grammar…)، وداخل كل مسار <strong>الوحدات</strong> —
+        كل وحدة ملف HTML مستقل مثل
+        <span class="mono" dir="ltr">sections/p1-t1-listen-u01-a7f3c2.html</span><br>
+        مفتاح <strong>مفتوح/مقفول</strong> بجانب كل عنصر: المقفول يظهر للطالب باسمه مع «🔒 قريبًا» ولا يُفتح.<br>
+        <strong>نصيحة أمنية:</strong> اجعل اسم كل ملف يحتوي رمزًا عشوائيًا — هذه المسارات
+        لا يقرأها إلا المشترك في هذا القسم.
       </div>
-      <div id="content-list" class="stack"></div>
+
+      <label class="field">
+        <span>الصف / القسم</span>
+        <select id="c-section" class="input"></select>
+      </label>
+
+      <div id="tree-root" class="tree"></div>
+      <button type="button" id="add-term" class="btn btn-ghost btn-sm">+ إضافة تِرم</button>
+
       <div id="content-msg" class="msg" hidden></div>
     </div>
     <div class="modal-foot">
       <button type="button" id="content-close" class="btn btn-ghost">إغلاق</button>
-      <button type="button" id="content-save" class="btn btn-primary">حفظ المسارات</button>
+      <button type="button" id="content-save" class="btn btn-primary">حفظ محتوى هذا القسم</button>
     </div>
   </div>
 </div>
 
-<script type="module" src="admin.js?v=5"></script>
+<script type="module" src="admin.js?v=6"></script>
 </body>
 </html>

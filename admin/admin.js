@@ -288,106 +288,227 @@ async function renewMember(id, days) {
   }
 }
 
-/* ========================= مودال روابط الأقسام ========================= */
-const cModal = $("#content-modal");
 
-/* بناء صف مسار واحد (اسم + ملف + حذف) */
-function trackRow(secId, track = {}) {
-  const row = document.createElement("div");
-  row.className = "track-row";
-  row.dataset.sec = secId;
-  row.innerHTML = `
-    <input class="input t-title" type="text" placeholder="اسم المسار (مثال: الكتاب الأول)"
-           value="${(track.title || "").replace(/"/g, "&quot;")}">
-    <input class="input mono t-url" type="text" dir="ltr" placeholder="sections/${secId}-XXXXXX.html"
-           value="${(track.url || track.path || "").replace(/"/g, "&quot;")}">
-    <button type="button" class="track-del" title="حذف المسار">✕</button>`;
-  row.querySelector(".track-del").onclick = () => {
-    const box = row.closest(".sec-box");
-    row.remove();
-    refreshCount(box);
-  };
-  return row;
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { mModal.hidden = true; cModal.hidden = true; }
+});
+
+/* ========================= محتوى الأقسام: تِرم ← مسار ← وحدة ========================= */
+const cModal = $("#content-modal");
+let TREE = [];          // شجرة القسم المفتوح حاليًا
+let CUR_SEC = null;
+
+const rid = (p) => p + Math.random().toString(36).slice(2, 7);
+
+/* قراءة مستند القسم وتحويل أي شكل قديم إلى الشكل الشجري */
+function toTree(data) {
+  if (!data) return [];
+  if (Array.isArray(data.terms)) {
+    return data.terms.map(tm => ({
+      id: tm.id || rid("term"), title: tm.title || "", enabled: tm.enabled !== false,
+      tracks: (tm.tracks || []).map(tr => ({
+        id: tr.id || rid("trk"), title: tr.title || "", enabled: tr.enabled !== false,
+        units: (tr.units || []).map(u => ({
+          id: u.id || rid("u"), title: u.title || "", url: u.url || u.path || "",
+          enabled: u.enabled !== false
+        }))
+      }))
+    }));
+  }
+  let units = (Array.isArray(data.tracks) ? data.tracks : [])
+    .filter(t => t && (t.url || t.path))
+    .map(t => ({ id: t.id || rid("u"), title: t.title || "", url: t.url || t.path, enabled: true }));
+  if (!units.length && (data.url || data.path))
+    units = [{ id: rid("u"), title: "المحتوى", url: data.url || data.path, enabled: true }];
+  if (!units.length) return [];
+  return [{ id: rid("term"), title: "الترم الأول", enabled: true,
+            tracks: [{ id: rid("trk"), title: "المحتوى", enabled: true, units }] }];
 }
 
-function refreshCount(box) {
-  const n = box.querySelectorAll(".track-row").length;
-  const badge = box.querySelector(".sec-count");
-  badge.textContent = n ? `${n} مسار` : "لا يوجد";
-  badge.classList.toggle("zero", n === 0);
+/* مفتاح مفتوح/مقفول */
+function toggleBtn(obj, render) {
+  const b = document.createElement("button");
+  b.type = "button";
+  const paint = () => {
+    b.className = "tg " + (obj.enabled ? "tg-on" : "tg-off");
+    b.textContent = obj.enabled ? "مفتوح" : "🔒 مقفول";
+    b.title = obj.enabled ? "اضغط للقفل" : "اضغط للفتح";
+  };
+  b.onclick = (e) => { e.preventDefault(); obj.enabled = !obj.enabled; paint(); if (render) render(); };
+  paint();
+  return b;
+}
+
+function delBtn(arr, obj, render) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "track-del"; b.textContent = "✕"; b.title = "حذف";
+  b.onclick = (e) => {
+    e.preventDefault();
+    if (!confirm("تأكيد الحذف؟ لن يُحذف الملف من GitHub، فقط من قائمة المنصة.")) return;
+    arr.splice(arr.indexOf(obj), 1); render();
+  };
+  return b;
+}
+
+function textInput(obj, key, ph, cls) {
+  const i = document.createElement("input");
+  i.className = "input " + (cls || ""); i.type = "text"; i.placeholder = ph;
+  i.value = obj[key] || "";
+  if (cls && cls.indexOf("mono") >= 0) i.dir = "ltr";
+  i.oninput = () => { obj[key] = i.value; };
+  i.onclick = (e) => e.preventDefault();   // منع فتح/غلق details عند الكتابة
+  return i;
+}
+
+function renderTree() {
+  const root = $("#tree-root");
+  root.innerHTML = "";
+
+  if (!TREE.length) {
+    root.innerHTML = '<div class="empty">لا يوجد محتوى لهذا القسم بعد. اضغط «+ إضافة تِرم».</div>';
+    return;
+  }
+
+  TREE.forEach((term, ti) => {
+    const box = document.createElement("details");
+    box.className = "tnode tnode-term"; box.open = true;
+
+    const sum = document.createElement("summary");
+    sum.innerHTML = '<span class="tbadge">تِرم ' + (ti + 1) + '</span>';
+    sum.appendChild(textInput(term, "title", "اسم التِرم (مثال: الترم الأول)"));
+    const units = term.tracks.reduce((n, t) => n + t.units.length, 0);
+    const cnt = document.createElement("span");
+    cnt.className = "sec-count" + (units ? "" : " zero");
+    cnt.textContent = units ? (term.tracks.length + " مسار · " + units + " وحدة") : "فارغ";
+    sum.appendChild(cnt);
+    sum.appendChild(toggleBtn(term, renderTree));
+    sum.appendChild(delBtn(TREE, term, renderTree));
+    box.appendChild(sum);
+
+    const body = document.createElement("div");
+    body.className = "tnode-body";
+
+    term.tracks.forEach((track, ri) => {
+      const tb = document.createElement("details");
+      tb.className = "tnode tnode-track"; tb.open = true;
+
+      const ts = document.createElement("summary");
+      ts.innerHTML = '<span class="tbadge tbadge-2">مسار ' + (ri + 1) + '</span>';
+      ts.appendChild(textInput(track, "title", "اسم المسار (مثال: Listening)"));
+      const c2 = document.createElement("span");
+      c2.className = "sec-count" + (track.units.length ? "" : " zero");
+      c2.textContent = track.units.length ? (track.units.length + " وحدة") : "فارغ";
+      ts.appendChild(c2);
+      ts.appendChild(toggleBtn(track, renderTree));
+      ts.appendChild(delBtn(term.tracks, track, renderTree));
+      tb.appendChild(ts);
+
+      const ub = document.createElement("div");
+      ub.className = "tnode-body";
+
+      track.units.forEach((unit, ui) => {
+        const row = document.createElement("div");
+        row.className = "unit-row";
+        const n = document.createElement("span");
+        n.className = "unit-n";
+        n.textContent = String(ui + 1).padStart(2, "0");
+        row.appendChild(n);
+        row.appendChild(textInput(unit, "title", "اسم الوحدة (مثال: Unit 1 — Where Am I)"));
+        row.appendChild(textInput(unit, "url", "sections/" + CUR_SEC + "-u01-xxxxxx.html", "mono"));
+        row.appendChild(toggleBtn(unit, null));
+        row.appendChild(delBtn(track.units, unit, renderTree));
+        ub.appendChild(row);
+      });
+
+      const addU = document.createElement("button");
+      addU.type = "button"; addU.className = "btn btn-ghost btn-sm";
+      addU.textContent = "+ إضافة وحدة";
+      addU.onclick = () => {
+        track.units.push({ id: rid("u"), title: "", url: "", enabled: true });
+        renderTree();
+      };
+      ub.appendChild(addU);
+      tb.appendChild(ub);
+      body.appendChild(tb);
+    });
+
+    const addT = document.createElement("button");
+    addT.type = "button"; addT.className = "btn btn-ghost btn-sm";
+    addT.textContent = "+ إضافة مسار";
+    addT.onclick = () => {
+      term.tracks.push({ id: rid("trk"), title: "", enabled: true, units: [] });
+      renderTree();
+    };
+    body.appendChild(addT);
+    box.appendChild(body);
+    root.appendChild(box);
+  });
+}
+
+async function loadSectionTree(secId) {
+  CUR_SEC = secId;
+  const snap = await getDoc(doc(db, "content", secId));
+  TREE = toTree(snap.exists() ? snap.data() : null);
+  renderTree();
 }
 
 $("#btn-content").onclick = async () => {
   hide($("#content-msg"));
-  const snap = await getDocs(collection(db, "content"));
-  const map = {};
-  snap.docs.forEach(d => {
-    const data = d.data();
-    let tracks = Array.isArray(data.tracks) ? data.tracks.filter(t => t && (t.url || t.path)) : [];
-    if (!tracks.length && (data.url || data.path))          // ترقية الشكل القديم تلقائيًا
-      tracks = [{ id: "main", title: "المحتوى", url: data.url || data.path }];
-    map[d.id] = tracks;
-  });
-
-  const list = $("#content-list");
-  list.innerHTML = "";
-  CATALOG.forEach(s => {
-    const box = document.createElement("details");
-    box.className = "sec-box";
-    box.dataset.sec = s.id;
-    box.innerHTML = `
-      <summary>${s.ar} <small class="mono" style="color:var(--text-muted)">(${s.id})</small>
-        <span class="sec-count zero">لا يوجد</span></summary>
-      <div class="sec-body">
-        <div class="rows"></div>
-        <button type="button" class="btn btn-ghost btn-sm add-track">+ إضافة مسار</button>
-      </div>`;
-    const rows = box.querySelector(".rows");
-    (map[s.id] || []).forEach(t => rows.appendChild(trackRow(s.id, t)));
-    box.querySelector(".add-track").onclick = () => {
-      rows.appendChild(trackRow(s.id));
-      refreshCount(box);
-      box.open = true;
-    };
-    refreshCount(box);
-    list.appendChild(box);
-  });
+  const sel = $("#c-section");
+  if (!sel.options.length)
+    sel.innerHTML = CATALOG.map(s => '<option value="' + s.id + '">' + s.ar + " (" + s.id + ")</option>").join("");
   cModal.hidden = false;
+  await loadSectionTree(sel.value || CATALOG[0].id);
 };
+
+$("#c-section").onchange = (e) => loadSectionTree(e.target.value);
+
+$("#add-term").onclick = () => {
+  TREE.push({ id: rid("term"), title: "", enabled: true, tracks: [] });
+  renderTree();
+};
+
 $("#content-close").onclick = () => cModal.hidden = true;
 cModal.addEventListener("click", e => { if (e.target === cModal) cModal.hidden = true; });
 
 $("#content-save").onclick = async () => {
   const btn = $("#content-save");
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> حفظ…';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> حفظ…';
   try {
-    const batch = writeBatch(db);
-    let total = 0, sections = 0;
+    let nu = 0;
+    const terms = TREE.map((tm, i) => ({
+      id: tm.id,
+      title: (tm.title || "").trim() || ("الترم " + (i + 1)),
+      enabled: tm.enabled !== false,
+      tracks: (tm.tracks || []).map((tr, j) => ({
+        id: tr.id,
+        title: (tr.title || "").trim() || ("مسار " + (j + 1)),
+        enabled: tr.enabled !== false,
+        units: (tr.units || [])
+          .filter(u => (u.url || "").trim())
+          .map((u, k) => {
+            nu++;
+            return {
+              id: u.id,
+              title: (u.title || "").trim() || ("وحدة " + (k + 1)),
+              url: u.url.trim(),
+              enabled: u.enabled !== false
+            };
+          })
+      }))
+    }));
 
-    $$(".sec-box").forEach(box => {
-      const secId  = box.dataset.sec;
-      const tracks = [];
-      box.querySelectorAll(".track-row").forEach((row, i) => {
-        const title = row.querySelector(".t-title").value.trim();
-        const url   = row.querySelector(".t-url").value.trim();
-        if (!url) return;                                   // صف بلا ملف = يُتجاهل
-        tracks.push({ id: "t" + (i + 1), title: title || `مسار ${i + 1}`, url });
-      });
-      if (tracks.length) { total += tracks.length; sections++; }
-      batch.set(doc(db, "content", secId),
-        { tracks, url: null, path: null, updatedAt: serverTimestamp() }, { merge: true });
-    });
+    await setDoc(doc(db, "content", CUR_SEC),
+      { terms: terms, tracks: null, url: null, path: null, updatedAt: serverTimestamp() },
+      { merge: true });
 
-    await batch.commit();
     setMsg($("#content-msg"),
-      `✅ تم الحفظ: <strong>${total}</strong> مسار في <strong>${sections}</strong> قسم.`, "ok");
+      "✅ تم حفظ محتوى <strong>" + CUR_SEC + "</strong>: " + terms.length + " تِرم · " + nu + " وحدة.", "ok");
   } catch (err) {
     setMsg($("#content-msg"), "تعذّر الحفظ: " + (err.code || err.message), "err");
   } finally {
-    btn.disabled = false; btn.textContent = "حفظ المسارات";
+    btn.disabled = false;
+    btn.textContent = "حفظ محتوى هذا القسم";
   }
 };
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { mModal.hidden = true; cModal.hidden = true; }
-});
