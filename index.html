@@ -144,7 +144,13 @@
 <!-- ═══════════ نافذة اختيار المسار داخل الصف ═══════════ -->
 <div id="tracks-modal" class="modal-back" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tracks-title">
-    <div class="modal-head"><h3 id="tracks-title">اختر المسار</h3></div>
+    <div class="modal-head tracks-head">
+      <span id="tracks-icon" class="tracks-icon">P6</span>
+      <div>
+        <h3 id="tracks-title">الصف السادس الابتدائي</h3>
+        <p id="tracks-sub">اختر المحتوى الذي تريد فتحه</p>
+      </div>
+    </div>
     <div class="modal-body">
       <div id="tracks-body" class="tracks-list"></div>
     </div>
@@ -152,6 +158,23 @@
       <button id="tracks-close" class="btn btn-ghost" type="button">إغلاق</button>
     </div>
   </div>
+</div>
+
+<!-- ═══════════ العارض الداخلي (يفتح الدرس داخل المنصة) ═══════════ -->
+<div id="viewer" class="viewer" hidden>
+  <div class="viewer-bar">
+    <button id="viewer-back" class="vbtn" type="button" aria-label="رجوع">
+      <span aria-hidden="true">→</span> رجوع
+    </button>
+    <div class="viewer-title">
+      <strong id="viewer-title">…</strong>
+      <span id="viewer-sub"></span>
+    </div>
+    <button id="viewer-reload" class="vbtn vicon" type="button" title="إعادة التحميل" aria-label="إعادة التحميل">⟲</button>
+    <button id="viewer-full" class="vbtn vicon" type="button" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+  </div>
+  <div class="viewer-load"><span class="spinner"></span> جارٍ تحميل الدرس…</div>
+  <iframe id="viewer-frame" title="محتوى الدرس" allow="autoplay; fullscreen; microphone"></iframe>
 </div>
 
 <!-- ═══════════ نافذة "قسم مقفول" ═══════════ -->
