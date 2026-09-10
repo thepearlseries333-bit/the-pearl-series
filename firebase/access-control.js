@@ -109,3 +109,59 @@ export async function fetchSectionTracks(sectionId) {
     url:   t.url   || t.path
   }));
 }
+
+/**
+ * شجرة محتوى القسم: تِرم ← مسار ← وحدة.
+ *
+ * شكل المستند الحديث:
+ *   content/p1 = { terms:[ { id,title,enabled, tracks:[ { id,title,enabled,
+ *                             units:[ {id,title,url,desc,enabled} ] } ] } ] }
+ *
+ * ويُدعَم القديم تلقائيًا: { tracks:[{title,url}] } أو { url:"..." }
+ * فيُحوَّل إلى تِرم واحد بلا اسم ← مسار واحد بلا اسم ← وحدات.
+ * (الواجهة تتخطّى أي مستوى لا يحمل اسمًا وفيه عنصر واحد.)
+ */
+export async function fetchSectionTree(sectionId) {
+  const snap = await getDoc(doc(db, "content", sectionId));
+  if (!snap.exists()) throw new Error("not-published");
+  const data = snap.data();
+
+  const clean = (v) => (typeof v === "string" ? v.trim() : "");
+  const on    = (v) => v !== false;               // الافتراضي: مفتوح
+
+  let terms = Array.isArray(data.terms) ? data.terms : null;
+
+  if (!terms) {                                    // ترقية الأشكال القديمة
+    let units = Array.isArray(data.tracks) ? data.tracks : [];
+    units = units.filter(u => u && (u.url || u.path));
+    if (!units.length && (data.url || data.path))
+      units = [{ id: "main", title: "المحتوى", url: data.url || data.path }];
+    if (!units.length) throw new Error("not-published");
+    terms = [{ id: "main", title: "", enabled: true,
+               tracks: [{ id: "main", title: "", enabled: true, units }] }];
+  }
+
+  const tree = terms.map((tm, i) => ({
+    id:      clean(tm.id) || ("term" + (i + 1)),
+    title:   clean(tm.title),
+    enabled: on(tm.enabled),
+    tracks: (Array.isArray(tm.tracks) ? tm.tracks : []).map((tr, j) => ({
+      id:      clean(tr.id) || ("track" + (j + 1)),
+      title:   clean(tr.title),
+      enabled: on(tr.enabled),
+      units: (Array.isArray(tr.units) ? tr.units : [])
+        .filter(u => u && (u.url || u.path))
+        .map((u, k) => ({
+          id:      clean(u.id) || ("unit" + (k + 1)),
+          title:   clean(u.title) || ("وحدة " + (k + 1)),
+          desc:    clean(u.desc),
+          url:     clean(u.url) || clean(u.path),
+          enabled: on(u.enabled)
+        }))
+    }))
+  }));
+
+  const any = tree.some(tm => tm.tracks.some(tr => tr.units.length));
+  if (!any) throw new Error("not-published");
+  return tree;
+}
