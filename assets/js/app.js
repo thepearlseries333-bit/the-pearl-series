@@ -334,8 +334,17 @@ function closeViewer(fromPop) {
   viewer.hidden = true;
   viewerFrame.src = "about:blank";      // يوقف أي صوت شغّال
   document.body.classList.remove("viewing");
+
+  /* الرجوع خطوة واحدة: نعود لقائمة الوحدات نفسها لا للصفحة الرئيسية */
+  if (BROWSE.stack.length) tracksModal.hidden = false;
+
   if (!fromPop && history.state && history.state.pearlViewer) history.back();
 }
+
+/* زر ☰ داخل ملف الدرس يطلب الرجوع لقائمة الوحدات */
+window.addEventListener("message", (e) => {
+  if (e.data && e.data.pearl === "back") closeViewer(false);
+});
 
 viewerFrame.addEventListener("load", () => { viewerLoad.hidden = true; clearTimeout(viewerTimer); });
 $("#viewer-back").addEventListener("click", () => closeViewer(false));
@@ -349,7 +358,7 @@ $("#viewer-full").addEventListener("click", () => {
 });
 window.addEventListener("popstate", () => closeViewer(true));
 
-$("#tracks-close").addEventListener("click", () => tracksModal.hidden = true);
+$("#tracks-close").addEventListener("click", () => { BROWSE.stack = []; tracksModal.hidden = true; });
 tracksModal.addEventListener("click", (e) => { if (e.target === tracksModal) tracksModal.hidden = true; });
 
 /* ---------- نافذة القفل ---------- */

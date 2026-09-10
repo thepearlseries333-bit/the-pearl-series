@@ -45,6 +45,32 @@ function block(title, text) {
   reveal();
 }
 
+/* ==========================================================================
+   ربط أزرار ملف الدرس بالمنصة
+   --------------------------------------------------------------------------
+   ملفات الدروس كانت تُفتح قديمًا من مجلدها الخاص، فزر ☰ فيها يشير إلى
+   index.html المجاور — وهو غير موجود داخل مجلد sections فلا يعرض شيئًا.
+   هنا نعيد ربطه: داخل المنصة يرجع لقائمة وحدات نفس المسار (بدون خروج)،
+   وخارجها يفتح المنصة.
+   ========================================================================== */
+const inFrame = window.parent !== window;
+
+function wireBackButtons() {
+  document.querySelectorAll('a.bk, a[href="index.html"], a[href="./index.html"]').forEach(a => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (inFrame) parent.postMessage({ pearl: "back" }, "*");
+      else location.href = HOME;
+    });
+    a.href = "#";
+    a.title = "رجوع لقائمة الوحدات";
+  });
+}
+
+if (document.readyState === "loading")
+  document.addEventListener("DOMContentLoaded", wireBackButtons);
+else wireBackButtons();
+
 watchAuth(async (user) => {
   if (!user) return block("يجب تسجيل الدخول أولًا", "هذا المحتوى متاح للمشتركين فقط.");
   try {
