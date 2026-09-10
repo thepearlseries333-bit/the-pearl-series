@@ -75,6 +75,34 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    /* ---------------- الأسعار (يقرأها الجميع، يكتبها الأدمن) ---------------- */
+    /* config/pricing = { p1: 250, p6: 300, ... } لعرضها في استمارة الاشتراك */
+    match /config/{docId} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    /* ---------------- طلبات الاشتراك ---------------- */
+    /*
+       ولي الأمر يدخل بحساب Google ثم يرسل طلبًا: بريده يؤخذ من الحساب نفسه
+       فلا يمكنه انتحال بريد غيره، ولا يمكنه تعديل الطلب أو قبوله.
+       القبول/الرفض للأدمن وحده.
+    */
+    match /requests/{reqId} {
+      allow create: if signedIn()
+                    && request.resource.data.email == myEmail()
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() <= 80
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() <= 20
+                    && request.resource.data.sections is list
+                    && request.resource.data.sections.size() <= 20;
+
+      allow read:   if isAdmin() || (signedIn() && resource.data.email == myEmail());
+      allow update, delete: if isAdmin();
+    }
+
     /* ---------------- سجل عمليات الإدارة (اختياري) ---------------- */
     match /audit/{logId} {
       allow read:   if isAdmin();
