@@ -8,7 +8,7 @@ import {
 } from "../../firebase/auth.js";
 import {
   fetchMember, checkIsAdmin, evaluateMember, hasAccess,
-  fetchCatalog, fetchSectionTracks
+  fetchCatalog, fetchSectionTree
 } from "../../firebase/access-control.js";
 import { GROUPS } from "./catalog.js";
 
@@ -190,9 +190,8 @@ async function openSection(sec, el) {
   const old = cta.textContent;
   cta.innerHTML = '<span class="spinner" style="width:14px;height:14px"></span> جارٍ الفتح…';
   try {
-    const tracks = await fetchSectionTracks(sec.id);
-    if (tracks.length === 1) openViewer(tracks[0], sec);
-    else showTracks(sec, tracks);
+    const tree = await fetchSectionTree(sec.id);
+    openBrowser(sec, tree);
   } catch (err) {
     if (err.message === "not-published") {
       showLock(sec, "هذا القسم قيد الرفع وسيتاح قريبًا بإذن الله.");
@@ -207,32 +206,84 @@ async function openSection(sec, el) {
 /* ---------- نافذة اختيار المسار داخل الصف ---------- */
 const tracksModal = $("#tracks-modal");
 
-function showTracks(sec, tracks) {
+/* تصفّح متدرّج: الصف ← تِرم ← مسار ← وحدة، كله في نفس النافذة */
+let BROWSE = { sec: null, stack: [] };   // stack: [{title, kind, items}]
+
+function openBrowser(sec, tree) {
+  BROWSE = { sec, stack: [] };
+  pushLevel("term", tree, "");
+  tracksModal.hidden = false;
+}
+
+/* يتخطّى المستوى تلقائيًا إذا كان فيه عنصر واحد بلا اسم (المحتوى القديم) */
+function pushLevel(kind, items, title) {
+  const visible = items.filter(x => x.enabled !== false || kind === "unit");
+  if (kind !== "unit" && visible.length === 1 && !visible[0].title) {
+    const only = visible[0];
+    return pushLevel(kind === "term" ? "track" : "unit",
+                     kind === "term" ? only.tracks : only.units, title);
+  }
+  BROWSE.stack.push({ kind, items, title });
+  renderLevel();
+}
+
+function renderLevel() {
+  const sec  = BROWSE.sec;
+  const lvl  = BROWSE.stack[BROWSE.stack.length - 1];
+  const path = BROWSE.stack.map(l => l.title).filter(Boolean);
+
   $("#tracks-icon").textContent  = sec.icon || "★";
-  $("#tracks-title").textContent = sec.ar || sec.id;
-  $("#tracks-sub").textContent   = `${tracks.length} مسارات متاحة — اختر ما تريد فتحه`;
+  $("#tracks-title").textContent = path.length ? path[path.length - 1] : (sec.ar || sec.id);
+
+  const label = { term: "التِرم", track: "المسار", unit: "الوحدة" }[lvl.kind];
+  const shown = lvl.items.filter(x => x.enabled !== false);
+  const soon  = lvl.items.length - shown.length;
+  $("#tracks-sub").textContent =
+    [sec.ar, ...path].filter(Boolean).join(" › ") + ` — اختر ${label}` +
+    (soon ? ` (${soon} قريبًا)` : "");
+
+  $("#tracks-back").hidden = BROWSE.stack.length < 2;
+
   const body = $("#tracks-body");
   body.innerHTML = "";
 
-  tracks.forEach((t, i) => {
+  if (!lvl.items.length) {
+    body.innerHTML = `<div class="empty">لا يوجد محتوى منشور هنا بعد.</div>`;
+    return;
+  }
+
+  lvl.items.forEach((it, i) => {
+    const open = it.enabled !== false;
     const item = document.createElement("button");
     item.type = "button";
-    item.className = "track-item";
+    item.className = "track-item" + (open ? "" : " track-soon");
+    item.disabled = !open;
+
+    const count = lvl.kind === "term"
+      ? (it.tracks || []).reduce((n, t) => n + (t.units || []).length, 0) + " وحدة"
+      : lvl.kind === "track" ? (it.units || []).length + " وحدة" : "";
+
     item.innerHTML = `
-      <span class="track-num">${i + 1}</span>
+      <span class="track-num">${lvl.kind === "unit" ? String(i + 1).padStart(2, "0") : i + 1}</span>
       <span class="track-text">
-        <strong>${t.title}</strong>
-        ${t.desc ? `<small>${t.desc}</small>` : ""}
+        <strong>${it.title || label + " " + (i + 1)}</strong>
+        ${it.desc ? `<small>${it.desc}</small>` : (count ? `<small>${count}</small>` : "")}
       </span>
-      <span class="track-go">افتح</span>`;
-    item.addEventListener("click", () => {
-      tracksModal.hidden = true;
-      openViewer(t, sec);
+      <span class="track-go">${open ? (lvl.kind === "unit" ? "افتح" : "التالي") : "🔒 قريبًا"}</span>`;
+
+    if (open) item.addEventListener("click", () => {
+      if (lvl.kind === "unit") { tracksModal.hidden = true; openViewer(it, sec); }
+      else pushLevel(lvl.kind === "term" ? "track" : "unit",
+                     lvl.kind === "term" ? (it.tracks || []) : (it.units || []),
+                     it.title);
     });
     body.appendChild(item);
   });
-  tracksModal.hidden = false;
 }
+
+$("#tracks-back").addEventListener("click", () => {
+  if (BROWSE.stack.length > 1) { BROWSE.stack.pop(); renderLevel(); }
+});
 
 /* ---------- العارض الداخلي: يفتح الدرس داخل المنصة ---------- */
 const viewer      = $("#viewer");
