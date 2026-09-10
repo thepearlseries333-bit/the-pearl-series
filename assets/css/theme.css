@@ -371,6 +371,12 @@ tbody tr:last-child td{border-bottom:none}
   padding:6px 12px;border-radius:var(--r-full);white-space:nowrap;
 }
 .track-item:hover .track-go{background:var(--navy-600);color:#fff;border-color:var(--navy-600)}
+.tracks-back{flex:none;width:38px;height:38px;font-size:1.1rem}
+.tracks-head p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-soon{opacity:.6;cursor:not-allowed}
+.track-soon:hover{transform:none;box-shadow:var(--shadow-sm);background:var(--surface-2);border-color:var(--border)}
+.track-soon .track-num{background:linear-gradient(135deg,var(--silver),#8f9bab)}
+.track-soon .track-go{color:var(--text-muted)}
 
 /* ============ العارض الداخلي (فتح الدرس داخل المنصة) ============ */
 .viewer{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;background:var(--bg)}
@@ -406,6 +412,43 @@ body.viewing{overflow:hidden}
 @media (max-width:520px){
   .vbtn{padding:7px 11px;font-size:.8rem}
   .viewer-title strong{font-size:.86rem}
+}
+
+/* ============ محرّر الشجرة: تِرم ← مسار ← وحدة ============ */
+.modal-lg{width:min(880px,100%)}
+.tree{margin:8px 0 12px}
+.tnode{border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:10px;background:var(--surface)}
+.tnode>summary{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;list-style:none;flex-wrap:wrap;
+}
+.tnode>summary::-webkit-details-marker{display:none}
+.tnode>summary::before{content:"▾";color:var(--brand);flex:none;transition:transform var(--tr)}
+.tnode[open]>summary::before{transform:rotate(180deg)}
+.tnode>summary .input{flex:1;min-width:140px;padding:8px 11px;font-size:.86rem}
+.tnode-term{border-inline-start:4px solid var(--navy-500)}
+.tnode-track{border-inline-start:4px solid var(--navy-300);background:var(--surface-2)}
+.tnode-body{padding:4px 12px 12px}
+.tbadge{
+  flex:none;font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:var(--r-full);
+  background:var(--navy-600);color:#fff;
+}
+.tbadge-2{background:var(--navy-300);color:var(--navy-900)}
+.unit-row{display:grid;grid-template-columns:auto 1fr 1.3fr auto auto;gap:7px;align-items:center;margin-bottom:7px}
+.unit-row .input{padding:8px 11px;font-size:.84rem}
+.unit-n{
+  flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:var(--brand-soft);color:var(--brand);font-family:var(--font-en);font-size:.76rem;font-weight:600;
+}
+.tg{
+  flex:none;border:1px solid transparent;border-radius:var(--r-full);cursor:pointer;
+  font-size:.72rem;font-weight:800;padding:6px 12px;white-space:nowrap;font-family:inherit;
+}
+.tg-on{background:rgba(30,142,90,.14);color:var(--ok);border-color:rgba(30,142,90,.35)}
+.tg-off{background:var(--surface-2);color:var(--text-muted);border-color:var(--border-strong)}
+@media (max-width:620px){
+  .unit-row{grid-template-columns:1fr auto auto;gap:6px}
+  .unit-row .unit-n{grid-row:span 2}
+  .unit-row .input{grid-column:1/-1}
 }
 
 /* ============ محرّر المسارات (لوحة الإدارة) ============ */
