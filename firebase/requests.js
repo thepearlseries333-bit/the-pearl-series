@@ -37,11 +37,13 @@ export function priceOf(pricing, sectionIds) {
 }
 
 /* ------------------------- الطلبات ------------------------- */
-export function submitRequest({ email, name, phone, sections, note, total }) {
+export function submitRequest({ email, name, parent, school, phone, sections, note, total }) {
   return addDoc(collection(db, "requests"), {
-    email: (email || "").trim().toLowerCase(),
-    name:  (name  || "").trim().slice(0, 80),
-    phone: (phone || "").trim().slice(0, 20),
+    email:  (email  || "").trim().toLowerCase(),
+    name:   (name   || "").trim().slice(0, 80),
+    parent: (parent || "").trim().slice(0, 80),
+    school: (school || "").trim().slice(0, 80),
+    phone:  (phone  || "").trim().slice(0, 20),
     sections: Array.isArray(sections) ? sections.slice(0, 20) : [],
     note:  (note || "").trim().slice(0, 300),
     total: Number(total) || 0,
