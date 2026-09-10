@@ -561,6 +561,8 @@ function renderRequests() {
     return '<div class="req-card' + cls + '">' +
       '<div class="req-main">' +
         "<h4>" + (r.name || "بدون اسم") + "</h4>" +
+        (r.parent ? "<p class=\"req-line\">👤 ولي الأمر: <b>" + r.parent + "</b></p>" : "") +
+        (r.school ? "<p class=\"req-line\">🏫 " + r.school + "</p>" : "") +
         '<p class="req-line mono" dir="ltr">' + r.email + "</p>" +
         '<p class="req-line">📱 <b>' + (r.phone || "—") + "</b> · " + when + "</p>" +
         (r.note ? '<p class="req-line">📝 ' + r.note + "</p>" : "") +
@@ -604,7 +606,8 @@ function acceptRequest(id) {
   setChips(r.sections || []);
   const y = new Date(); y.setDate(y.getDate() + 365);
   $("#f-expires").value = y.toISOString().slice(0, 10);
-  $("#f-notes").value = "من طلب اشتراك بتاريخ " +
+  $("#f-notes").value = (r.parent ? "ولي الأمر: " + r.parent + " — " : "") +
+    (r.school ? "المدرسة: " + r.school + " — " : "") + "من طلب اشتراك بتاريخ " +
     (r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString("ar-EG") : "") +
     (r.total ? " — الإجمالي " + r.total + " " + curr() : "") + (r.note ? " — " + r.note : "");
   setMsg($("#form-msg"), "هذه البيانات جاءت من طلب ولي الأمر — راجعها ثم اضغط حفظ لإنشاء الحساب.", "info");
