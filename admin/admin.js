@@ -10,6 +10,7 @@ import { db } from "../firebase/firebase-config.js";
 import { watchAuth, logout, normalizeEmail, createMemberAccount, generateCode } from "../firebase/auth.js";
 import { BRAND } from "../firebase/firebase-config.js";
 import { checkIsAdmin, toDate, fetchCatalog } from "../firebase/access-control.js";
+import { listRequests, setRequestStatus, deleteRequest, fetchPricing, savePricing } from "../firebase/requests.js";
 import {
   collection, getDocs, doc, setDoc, deleteDoc, getDoc,
   serverTimestamp, Timestamp, writeBatch
@@ -58,6 +59,8 @@ watchAuth(async (user) => {
   CATALOG = await fetchCatalog();
   buildSectionChips();
   await loadMembers();
+  PRICING = await fetchPricing();
+  await loadRequests();
 });
 
 $("#admin-logout").addEventListener("click", () => logout().then(() => location.href = "../index.html"));
@@ -134,6 +137,7 @@ $("#btn-refresh").addEventListener("click", () => loadMembers());
 /* ========================= مودال المشترك ========================= */
 const mModal = $("#member-modal");
 let EDITING = null;
+let PENDING_REQ = null;
 
 function buildSectionChips() {
   $("#f-sections").innerHTML = CATALOG.map(s => `
@@ -196,7 +200,7 @@ function openMember(id) {
 }
 
 $("#btn-add").onclick      = () => openMember(null);
-$("#member-cancel").onclick = () => mModal.hidden = true;
+$("#member-cancel").onclick = () => { PENDING_REQ = null; mModal.hidden = true; };
 mModal.addEventListener("click", e => { if (e.target === mModal) mModal.hidden = true; });
 
 $("#member-form").addEventListener("submit", async (e) => {
@@ -234,6 +238,14 @@ $("#member-form").addEventListener("submit", async (e) => {
       payload.accessCode = code;                // نحتفظ به لتذكير ولي الأمر
     }
     await setDoc(doc(db, "members", email), payload, { merge: true });
+
+    /* لو الحفظ جاء من قبول طلب: علّم الطلب مقبولًا */
+    if (PENDING_REQ) {
+      try { await setRequestStatus(PENDING_REQ, "accepted", { memberEmail: email }); } catch {}
+      PENDING_REQ = null;
+      await loadRequests();
+    }
+
     mModal.hidden = true;
     await loadMembers();
 
@@ -290,7 +302,7 @@ async function renewMember(id, days) {
 
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { mModal.hidden = true; cModal.hidden = true; }
+  if (e.key === "Escape") { mModal.hidden = true; cModal.hidden = true; if (typeof pModal !== "undefined") pModal.hidden = true; }
 });
 
 /* ========================= محتوى الأقسام: تِرم ← مسار ← وحدة ========================= */
@@ -510,5 +522,132 @@ $("#content-save").onclick = async () => {
   } finally {
     btn.disabled = false;
     btn.textContent = "حفظ محتوى هذا القسم";
+  }
+};
+
+/* ========================= طلبات الاشتراك + الأسعار ========================= */
+let REQS = [], PRICING = {}, SHOW_DONE = false;
+
+const curr = () => PRICING.currency || "جنيه";
+const secName = (id) => (CATALOG.find(c => c.id === id) || {}).ar || id;
+
+async function loadRequests() {
+  try { REQS = await listRequests(); }
+  catch (err) { REQS = []; console.warn("requests:", err.code || err.message); }
+  renderRequests();
+}
+
+function renderRequests() {
+  const pend = REQS.filter(r => r.status === "pending");
+  const badge = $("#req-badge");
+  badge.textContent = pend.length;
+  badge.hidden = pend.length === 0;
+
+  const list = SHOW_DONE ? REQS : pend;
+  const box = $("#req-list");
+
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">' +
+      (SHOW_DONE ? "لا توجد طلبات." : "لا توجد طلبات جديدة بانتظارك.") + "</div>";
+    return;
+  }
+
+  box.innerHTML = list.map(r => {
+    const when = r.createdAt && r.createdAt.toDate
+      ? r.createdAt.toDate().toLocaleString("ar-EG", { dateStyle: "short", timeStyle: "short" }) : "";
+    const cls = r.status === "accepted" ? " done" : r.status === "rejected" ? " no" : "";
+    const secs = (r.sections || []).map(s => "<span>" + secName(s) + "</span>").join("");
+    const wa = r.phone ? r.phone.replace(/^0/, "20").replace(/\D/g, "") : "";
+    return '<div class="req-card' + cls + '">' +
+      '<div class="req-main">' +
+        "<h4>" + (r.name || "بدون اسم") + "</h4>" +
+        '<p class="req-line mono" dir="ltr">' + r.email + "</p>" +
+        '<p class="req-line">📱 <b>' + (r.phone || "—") + "</b> · " + when + "</p>" +
+        (r.note ? '<p class="req-line">📝 ' + r.note + "</p>" : "") +
+        '<div class="req-secs">' + secs + "</div>" +
+      "</div>" +
+      '<div class="req-actions">' +
+        (r.total ? '<span class="req-total">' + r.total + " " + curr() + "</span>" : "") +
+        (wa ? '<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/' + wa + '">واتساب</a>' : "") +
+        (r.status === "pending"
+          ? '<button class="btn btn-primary btn-sm" data-acc="' + r.id + '">✓ قبول</button>' +
+            '<button class="btn btn-danger btn-sm" data-rej="' + r.id + '">✕ رفض</button>'
+          : '<span class="pill pill-' + (r.status === "accepted" ? "active" : "expired") + '">' +
+            (r.status === "accepted" ? "مقبول" : "مرفوض") + "</span>" +
+            '<button class="btn btn-ghost btn-sm" data-del="' + r.id + '">حذف</button>') +
+      "</div></div>";
+  }).join("");
+
+  $$("[data-acc]").forEach(b => b.onclick = () => acceptRequest(b.dataset.acc));
+  $$("[data-rej]").forEach(b => b.onclick = () => rejectRequest(b.dataset.rej));
+  $$("#req-list [data-del]").forEach(b => b.onclick = async () => {
+    if (!confirm("حذف هذا الطلب نهائيًا؟")) return;
+    await deleteRequest(b.dataset.del); await loadRequests();
+  });
+}
+
+$("#req-toggle").onclick = () => {
+  SHOW_DONE = !SHOW_DONE;
+  $("#req-toggle").textContent = SHOW_DONE ? "إظهار الجديدة فقط" : "إظهار المنفَّذة";
+  renderRequests();
+};
+
+/* القبول: يفتح نافذة إضافة مشترك مملوءة ببيانات الطلب */
+function acceptRequest(id) {
+  const r = REQS.find(x => x.id === id);
+  if (!r) return;
+  PENDING_REQ = id;
+  openMember(null);
+  $("#f-email").value = r.email;
+  $("#f-name").value  = r.name  || "";
+  $("#f-phone").value = r.phone || "";
+  setChips(r.sections || []);
+  const y = new Date(); y.setDate(y.getDate() + 365);
+  $("#f-expires").value = y.toISOString().slice(0, 10);
+  $("#f-notes").value = "من طلب اشتراك بتاريخ " +
+    (r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleDateString("ar-EG") : "") +
+    (r.total ? " — الإجمالي " + r.total + " " + curr() : "") + (r.note ? " — " + r.note : "");
+  setMsg($("#form-msg"), "هذه البيانات جاءت من طلب ولي الأمر — راجعها ثم اضغط حفظ لإنشاء الحساب.", "info");
+}
+
+async function rejectRequest(id) {
+  if (!confirm("رفض هذا الطلب؟")) return;
+  try { await setRequestStatus(id, "rejected"); await loadRequests(); }
+  catch (err) { setMsg($("#admin-msg"), "تعذّر الرفض: " + (err.code || err.message), "err"); }
+}
+
+/* ------------------------- الأسعار ------------------------- */
+const pModal = $("#price-modal");
+
+$("#btn-prices").onclick = async () => {
+  hide($("#price-msg"));
+  PRICING = await fetchPricing();
+  $("#p-currency").value = PRICING.currency || "جنيه";
+  $("#price-list").innerHTML = CATALOG.map(s =>
+    '<div class="price-row"><span>' + s.ar + ' <small class="mono">(' + s.id + ')</small></span>' +
+    '<input class="input mono" type="number" min="0" step="5" dir="ltr" data-price="' + s.id +
+    '" value="' + (Number(PRICING[s.id]) || "") + '" placeholder="0"></div>').join("");
+  pModal.hidden = false;
+};
+$("#price-close").onclick = () => pModal.hidden = true;
+pModal.addEventListener("click", e => { if (e.target === pModal) pModal.hidden = true; });
+
+$("#price-save").onclick = async () => {
+  const btn = $("#price-save");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> حفظ…';
+  try {
+    const map = { currency: ($("#p-currency").value.trim() || "جنيه") };
+    $$("[data-price]").forEach(i => {
+      const v = Number(i.value);
+      if (v > 0) map[i.dataset.price] = v;
+    });
+    await savePricing(map);
+    PRICING = map;
+    renderRequests();
+    setMsg($("#price-msg"), "✅ تم حفظ الأسعار — ستظهر فورًا في استمارة الاشتراك.", "ok");
+  } catch (err) {
+    setMsg($("#price-msg"), "تعذّر الحفظ: " + (err.code || err.message), "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "حفظ الأسعار";
   }
 };

@@ -7,7 +7,7 @@
 <link rel="icon" href="../assets/img/pearl-logo.jpg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Playfair+Display:wght@600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/theme.css?v=6">
+<link rel="stylesheet" href="../assets/css/theme.css?v=7">
 </head>
 <body>
 
@@ -79,8 +79,16 @@
       </select>
       <button id="btn-add" class="btn btn-primary">+ إضافة مشترك</button>
       <button id="btn-content" class="btn btn-ghost">محتوى الأقسام</button>
+      <button id="btn-prices" class="btn btn-ghost">الأسعار</button>
       <button id="btn-refresh" class="btn btn-ghost" title="تحديث">↻</button>
     </div>
+
+    <!-- طلبات الاشتراك الواردة -->
+    <div class="section-title" style="margin-top:26px">
+      <h3>طلبات الاشتراك <span id="req-badge" class="badge-count" hidden>0</span></h3>
+      <button id="req-toggle" class="btn btn-ghost btn-sm" type="button">إظهار المنفَّذة</button>
+    </div>
+    <div id="req-list"></div>
 
     <div id="admin-msg" class="msg" hidden></div>
 
@@ -201,6 +209,30 @@
   </div>
 </div>
 
-<script type="module" src="admin.js?v=6"></script>
+<!-- ═══ مودال الأسعار ═══ -->
+<div id="price-modal" class="modal-back" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3>أسعار الاشتراك لكل صف</h3></div>
+    <div class="modal-body">
+      <div class="msg msg-info" style="margin-top:0">
+        السعر الذي تكتبه هنا يظهر لولي الأمر داخل <strong>استمارة طلب الاشتراك</strong>
+        بجانب كل صف، ويُحسب الإجمالي تلقائيًا. اتركه <strong>فارغًا أو صفرًا</strong>
+        ليظهر «حسب الاتفاق».
+      </div>
+      <label class="field" style="max-width:220px">
+        <span>العملة</span>
+        <input id="p-currency" class="input" type="text" placeholder="جنيه">
+      </label>
+      <div id="price-list"></div>
+      <div id="price-msg" class="msg" hidden></div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" id="price-close" class="btn btn-ghost">إغلاق</button>
+      <button type="button" id="price-save" class="btn btn-primary">حفظ الأسعار</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="admin.js?v=7"></script>
 </body>
 </html>
