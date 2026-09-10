@@ -157,6 +157,7 @@ function renderApp() {
   for (const g of groups) {
     const head = document.createElement("div");
     head.className = "section-title";
+    head.dataset.group = g.id;
     head.innerHTML = `<h3>${g.ar}</h3>`;
     root.appendChild(head);
 
@@ -172,6 +173,7 @@ function makeTile(sec, unlocked) {
   const el = document.createElement("button");
   el.type = "button";
   el.className = "tile " + (unlocked ? "tile-unlocked" : "tile-locked");
+  el.dataset.group = sec.group || "";
   el.innerHTML = `
     <span class="tile-status ${unlocked ? "badge-open" : "badge-lock"}">${unlocked ? "مفتوح" : "🔒 مقفول"}</span>
     <span class="tile-icon">${sec.icon || "★"}</span>
@@ -189,7 +191,7 @@ async function openSection(sec, el) {
   cta.innerHTML = '<span class="spinner" style="width:14px;height:14px"></span> جارٍ الفتح…';
   try {
     const tracks = await fetchSectionTracks(sec.id);
-    if (tracks.length === 1) window.open(tracks[0].url, "_blank", "noopener");
+    if (tracks.length === 1) openViewer(tracks[0], sec);
     else showTracks(sec, tracks);
   } catch (err) {
     if (err.message === "not-published") {
@@ -206,7 +208,9 @@ async function openSection(sec, el) {
 const tracksModal = $("#tracks-modal");
 
 function showTracks(sec, tracks) {
-  $("#tracks-title").textContent = `${sec.ar} — اختر ما تريد فتحه`;
+  $("#tracks-icon").textContent  = sec.icon || "★";
+  $("#tracks-title").textContent = sec.ar || sec.id;
+  $("#tracks-sub").textContent   = `${tracks.length} مسارات متاحة — اختر ما تريد فتحه`;
   const body = $("#tracks-body");
   body.innerHTML = "";
 
@@ -220,15 +224,54 @@ function showTracks(sec, tracks) {
         <strong>${t.title}</strong>
         ${t.desc ? `<small>${t.desc}</small>` : ""}
       </span>
-      <span class="track-go">افتح ←</span>`;
+      <span class="track-go">افتح</span>`;
     item.addEventListener("click", () => {
-      window.open(t.url, "_blank", "noopener");
       tracksModal.hidden = true;
+      openViewer(t, sec);
     });
     body.appendChild(item);
   });
   tracksModal.hidden = false;
 }
+
+/* ---------- العارض الداخلي: يفتح الدرس داخل المنصة ---------- */
+const viewer      = $("#viewer");
+const viewerFrame = $("#viewer-frame");
+const viewerLoad  = $(".viewer-load");
+let viewerOpen = false;
+
+function openViewer(track, sec) {
+  $("#viewer-title").textContent = track.title || sec.ar;
+  $("#viewer-sub").textContent   = sec.ar || "";
+  viewerLoad.hidden = false;
+  viewerFrame.src = track.url;
+  viewer.hidden = false;
+  document.body.classList.add("viewing");
+  viewerOpen = true;
+  // زر الرجوع في الهاتف يغلق العارض بدل الخروج من المنصة
+  history.pushState({ pearlViewer: true }, "");
+}
+
+function closeViewer(fromPop) {
+  if (!viewerOpen) return;
+  viewerOpen = false;
+  viewer.hidden = true;
+  viewerFrame.src = "about:blank";      // يوقف أي صوت شغّال
+  document.body.classList.remove("viewing");
+  if (!fromPop && history.state && history.state.pearlViewer) history.back();
+}
+
+viewerFrame.addEventListener("load", () => { viewerLoad.hidden = true; });
+$("#viewer-back").addEventListener("click", () => closeViewer(false));
+$("#viewer-reload").addEventListener("click", () => {
+  viewerLoad.hidden = false;
+  viewerFrame.src = viewerFrame.src;
+});
+$("#viewer-full").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else viewer.requestFullscreen && viewer.requestFullscreen();
+});
+window.addEventListener("popstate", () => closeViewer(true));
 
 $("#tracks-close").addEventListener("click", () => tracksModal.hidden = true);
 tracksModal.addEventListener("click", (e) => { if (e.target === tracksModal) tracksModal.hidden = true; });
@@ -245,7 +288,10 @@ function showLock(sec, customText) {
 $("#lock-close").addEventListener("click", () => lockModal.hidden = true);
 lockModal.addEventListener("click", (e) => { if (e.target === lockModal) lockModal.hidden = true; });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { lockModal.hidden = true; tracksModal.hidden = true; }
+  if (e.key === "Escape") {
+    lockModal.hidden = true; tracksModal.hidden = true;
+    if (viewerOpen) closeViewer(false);
+  }
 });
 
 /* ========================= بدء التشغيل ========================= */
