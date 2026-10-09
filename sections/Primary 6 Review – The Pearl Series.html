@@ -1,0 +1,216 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Primary 6 Review – The Pearl Series</title>
+<style>
+:root{--bg:#f4f1fb;--c:#fff;--t:#2d2a4a;--p:#7a5fb5;--g:#2e9e77;--r:#d9534f;--y:#e8c25a;--h:#322e52}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1d1b30;--c:#2b2847;--t:#f1eefc}}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--t);font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:22px;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+header{background:var(--h);color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header h1{margin:0;font-size:34px;color:var(--y)}header small{display:block;color:#cfc6ee;font-size:17px}
+.brand{text-align:right;font-weight:800;font-size:24px}.brand span{display:block;font-size:16px;color:#b8f0d8;font-weight:600}
+nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;position:sticky;top:0;background:var(--bg);z-index:5}
+nav button,.ctl button{font:inherit;font-size:18px;border:0;border-radius:30px;padding:10px 18px;background:var(--c);color:var(--t);cursor:pointer;box-shadow:0 1px 4px #0003}
+nav button.on{background:var(--p);color:#fff}
+main{padding:10px 20px 60px;max-width:1300px;margin:auto}
+.ctl{display:flex;gap:10px;align-items:center;margin:8px 0 16px;flex-wrap:wrap}.ctl button{background:var(--g);color:#fff}
+.sc{margin-left:auto;font-weight:800}
+.card{background:var(--c);border-radius:16px;padding:16px 22px;margin:12px 0;box-shadow:0 2px 8px #0002}
+.q{display:flex;gap:12px;align-items:flex-start;font-weight:700}
+.n{background:var(--p);color:#fff;border-radius:50%;min-width:38px;height:38px;display:grid;place-items:center;font-size:18px}
+.sp{margin-left:auto;border:0;background:none;font-size:24px;cursor:pointer}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0 2px}
+.opt{font:inherit;font-size:21px;padding:10px;border:3px solid #b9aee0;border-radius:12px;background:transparent;color:var(--t);cursor:pointer;text-align:left}
+.opt.ok{background:var(--g);border-color:var(--g);color:#fff}.opt.no{background:var(--r);border-color:var(--r);color:#fff}
+.b{display:inline-block;min-width:90px;border-bottom:3px dotted var(--p);cursor:pointer;color:transparent;text-align:center}
+.b.show{color:var(--g);font-weight:800;border-bottom-color:var(--g)}
+.box{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.box i{font-style:normal;border:2px solid var(--p);border-radius:20px;padding:2px 14px;font-size:19px}
+.rv{font:inherit;font-size:17px;border:2px solid var(--g);color:var(--g);background:transparent;border-radius:20px;padding:4px 14px;margin-top:8px;cursor:pointer}
+.ans{display:none;color:var(--g);font-weight:700;margin-top:6px}.ans.show{display:block}
+.pass{border:2px solid var(--p);border-radius:14px;padding:14px 18px;font-weight:400;line-height:1.55;margin-bottom:10px}
+.ab{display:flex;gap:10px;align-items:center;margin:8px 0;background:var(--c);border-radius:30px;padding:8px 14px;box-shadow:0 1px 4px #0003}.ab button{font:inherit;font-size:20px;border:0;border-radius:50%;width:44px;height:44px;background:var(--p);color:#fff;cursor:pointer}.ab input{flex:1;accent-color:var(--g);height:8px}.ab select{font:inherit;font-size:16px;border-radius:10px;padding:4px;background:var(--bg);color:var(--t)}.ab span{font-size:17px;font-weight:700}h2{color:var(--p)}.note{font-size:16px;color:#c07b00}
+</style></head><body>
+<header><div><h1>PRIMARY SIX · Units 1–3 Review</h1><small>Interactive whiteboard edition with answers · نسخة تفاعلية للسبورة بالإجابات</small></div>
+<div class="brand">The Pearl Series ★ Five Stars in English<span>Mr. Youssef Osman · مستر يوسف عثمان</span></div></header>
+<nav id="nav"></nav><main id="m"></main>
+<div style="text-align:center;font-size:15px;opacity:.7;padding:10px">Original content: Level Up English – مراجعة مستر محمود الزيادي · Interactive version by Mr. Youssef Osman</div>
+<script>
+const M=`1~We ___ souvenirs from Khan El Khalili.~do~sell~buy~eat~2
+2~Tourists come to Egypt to ___ the ancient sites.~play~visit~have~read~1
+3~Carpenters ___ furniture in Damietta.~run~watch~write~make~3
+4~They spend a great day ___ Aswan.~of~in~off~from~1
+5~His family learns many new things about the Egyptian ___~Stadium~Science~Museum~Math~2
+6~Ahmed ___ to school every day.~walk~walks~walked~walking~1
+7~Asmaa ___ us every week.~visits~visit~is visiting~visited~0
+8~The moon ___ round the earth.~go~went~goes~going~2
+9~Sama often ___ her homework at six.~do~does~done~doing~1
+10~I sometimes ___ the floor.~sweeps~sweep~swept~sweeping~1
+11~She always ___ her bed.~make~made~makes~making~2
+12~He never ___ to school late.~go~went~goes~going~2
+13~We always ___ football at seven on Friday.~play~plays~played~playing~0
+14~Every morning, Ahmed ___ a cup of tea.~drink~drank~drinks~drinking~2
+15~What time ___ you leave for school every day?~do~does~doing~did~0
+16~He never ___ tennis.~play~plays~playing~played~1
+17~She often ___ English.~study~studies~studying~studied~1
+18~The sun ___ us light.~gives~give~giving~gave~0
+19~I usually ___ stories at night.~read~reads~reading~am reading~0
+22~___ are a kind of animals.~Tablets~Kangaroos~Shorts~Vets~1
+23~I like to ___ photos with my phone.~read~take~play~buy~1
+24~I ___ fresh food.~like~likes~liking~to like~0
+25~What are you ___ ?~do~does~doing~did~2
+26~Let's ___ the rubbish out.~read~take~play~buy~1
+27~He ___ rice very much.~like~likes~liking~to like~1
+28~What are you ___ now?~draw~drew~drawing~draws~2
+29~We ___ football every day.~play~plays~played~playing~0
+30~It ___ snows in summer in Egypt.~never~sometimes~often~ever~0
+31~I ___ out the weeds from the garden every morning.~pull~check~do~eat~0
+32~We help my grandpa ___ for the plants in his garden.~care~grow~take~have~0
+33~Every morning, I ___ for insects on the plants.~make~take~look~pay~2
+34~Grandpa ___ care of his plants every day.~does~has~takes~sells~2
+35~What is hibiscus used ___ in the family?~from~for~off~of~1
+36~When it's hot, people drink water and rest in the ___~shade~sun~heat~dust~0
+37~I like looking at the high ___ in the sea.~stars~mountains~clouds~waves~3
+38~It is windy and the sky is full of dark ___~waves~glasses~plants~clouds~3
+39~In ___ weather, people should drink a lot of water.~rainy~hot~cool~cold~1
+40~The streets are ___ because it is raining heavily.~dry~wet~dusty~rainy~1
+41~We wear hats to ___ ourselves from the sun.~heat~clean~grow~protect~3
+42~What are you ___, Nada?~do~does~did~doing~3
+43~I'm ___ for the football game.~practicing~practice~practiced~practices~0
+44~A ___ brings food or packages to places.~street cleaner~delivery person~nurse~doctor~1
+45~Water ___ make sure people get clean water.~teachers~doctors~engineers~farmers~2
+46~Mechanics fix ___~vehicles~computers~televisions~bags~0
+47~The traffic officer helps people ___ the road.~make~cross~put~correct~1
+48~A ___ helps patients in emergencies.~paramedic~cleaner~policeman~student~0
+49~I went to the ___ to send a letter.~bank~library~museum~post office~3
+50~Clean the room by ___, Ali.~yourself~himself~herself~myself~0
+51~My favorite ___ is football.~sport~book~team~meal~0
+52~I am ___ in watching films.~interest~interested~interesting~interests~1
+53~___ are you doing now, Adham?~What~Where~How~Why~0
+54~A paramedic helps people in an ___~school~emergency~shop~park~1
+55~A mechanic fixes ___~clothes~vehicles~food~books~1
+56~A traffic officer helps people ___ the road.~make~cross~build~draw~1
+57~We use "can" to talk about ___~past~ability~place~time~1
+58~She is ___ to speak English well.~can~able~ability~be~1`.split("\n");
+const RC=[["Set 1",[["A","landscape | coral reefs | culture | protected | clean and safe","Ras Mohamed is a (1) [[protected]] area, so people must care for it. It's important to keep the park (2) [[clean and safe]]. People enjoy the quiet and beautiful (3) [[landscape]] in Ras Mohamed National Park. Ras Mohamed is full of animals, plants, and colorful (4) [[coral reefs]] under its sea. Visitors can learn about the (5) [[culture]] of the local people."],
+["B","spin | fishermen | harvest | fishing nets","In the village, some people are (1) [[fishermen]]. In the village, people fish using small (2) [[fishing nets]]. Farmers in Salma's village (3) [[harvest]] the crops. Hassan's family (4) [[spin]] wool and weaves it on looms."],
+["C","oil | grow | herbs | water","Since ancient times, people used olives to make (1) [[oil]]. My brother and I have a plant. We (2) [[water]] it every day. In Egypt, people use (3) [[herbs]] like basil in cooking. Farmers (4) [[grow]] fruits like guavas and figs."],
+["D","work | time | study | write | list","I have tips for studying. I (1) [[study]] for about 30 minutes. I study at the same (2) [[time]] each day. People's brains (3) [[work]] better if they have a regular routine. It's helpful if you (4) [[write]] down what you want to do each time you study. Then I check it off the (5) [[list]] when I finish studying and feel proud!"],
+["E","souvenirs | sites | juice | designs","My name is Amir. I usually visit ancient (1) [[sites]] with my friends. I sometimes go there with my family. My father likes to walk through the old streets. There are many beautiful doors and buildings with Arabic (2) [[designs]]. I sometimes buy some (3) [[souvenirs]]. I take photos of the places we visit."]]],
+["Set 2",[["A","animals | carries | birds | desert | flows","A river is a source of life. It (1) [[carries]] fresh water to people and (2) [[flows]] through the land, bringing life to the country. Many different kinds of (3) [[animals]] live near it. Beautiful (4) [[birds]] live in its water."],
+["B","United States | research | Egypt | Ain Shams | Egyptian","Dr. Mostafa El-Sayed is a famous (1) [[Egyptian]] scientist. He was born in (2) [[Egypt]] in 1933. He studied at (3) [[Ain Shams]] University in Cairo. Later, he went to the (4) [[United States]] to continue his scientific (5) [[research]]."],
+["C","him | chemistry | tiny | idea | discoveries","Dr. El-Sayed became an expert in (1) [[chemistry]] and nanoscience. Nanoscience is the study of very (2) [[tiny]] things. One of his important (3) [[discoveries]] is called El-Sayed's Rule. It is a scientific (4) [[idea]] named after (5) [[him]]."],
+["D","cancer | awards | proud | nanoparticles | Science","Dr. El-Sayed used gold (1) [[nanoparticles]] to help doctors detect and treat some types of (2) [[cancer]]. He received many important (3) [[awards]], including the U.S. National Medal of (4) [[Science]]. Egypt is very (5) [[proud]] of him."],
+["E","community | emergency | research | important","Omar lives in a big (1) [[community]] and helps people live better lives. He is doing (2) [[research]] about jobs that help people. A paramedic helps in an (3) [[emergency]]. Every job is (4) [[important]]."]]]];
+const F=`1~Ibrahim [[travels]] (travel) to a different country every year.
+2~[[Do]] (Does) Remas and Aseel go to work by bus?
+3~Lama [[doesn't]] (don't) study in the afternoon.
+4~How [[does]] (do) Yossif get ready for the exam?
+5~She [[never]] (usually) eats meat. She hates it very much.
+6~Nada [[does not / doesn't]] (not) play tennis every day.
+7~[[Do]] (Does) you usually watch football matches?
+8~They always [[tidy]] (tidies) the kitchen for their mum.
+9~The club [[closes]] (close) at 11:00 pm.
+10~It is very cheap; it [[doesn't]] (don't) cost much.
+11~[[Is]] (Be) Omer happy now?
+12~Aisha never [[drinks]] (drink) tea at night.
+13~Eman [[always goes]] (goes always) to work early.
+14~Mohamed [[is playing]] (play) tennis in the club now.
+15~[[Are]] (Do) you [[eating]] (eat) your lunch at the moment?
+16~I [[am not wearing]] (not wear) my jacket. It's hot. / I [[don't wear]]
+17~My friend and I [[are visiting]] (visit) London now.
+18~Ahmed [[is cleaning]] (clean) his room right now.
+19~The sun [[is shining]] (shine) brightly today.
+20~She [[is closing]] (close) the window because it's raining. / [[closes]]
+21~Nora [[isn't studying]] (not study) for the test. She is watching TV.
+22~Are the birds [[flying]] (fly) in the sky?
+23~Why [[are]] (do) they not revising hard?
+24~We [[are celebrating]] (celebrate) my sister's birthday tonight.
+25~[[Are]] (Do) your aunts visiting you tonight?
+26~He [[is watering]] (water) the flowers in the garden at the moment.
+27~She [[can't / cannot]] (not can) walk to school.
+28~I am [[able to]] (able) run fast.
+29~[[Can]] (Can't) they do the research? - Yes, they can.
+30~[[Are]] (Do) they able to tidy the flat?
+31~She [[can't / cannot]] (not can) help her community alone.
+32~They are [[able to]] (able) solve the problem.
+33~[[Can]] (Can) you help your neighbors?
+34~He [[works]] (work) as a mechanic in the city.
+35~We [[don't waste]] (not waste) water every day.
+36~She is [[able to]] (able) ride a bike safely.
+37~The traffic officer [[helps]] (help) people every day.
+38~They [[make]] (make) posters to help the community.`.split("\n");
+const R=[["A Day in Egypt","People can enjoy many activities in one day in Egypt. In the morning, tourists visit ancient sites like the pyramids. Then, they walk to a small museum to learn more about history. After that, they go to Khan El Khalili to buy souvenirs such as handmade gifts. Some people like to take photos in beautiful places. At night, people can relax and listen to music. Egypt is a great place to visit and have fun.",["Tourists go to Khan El Khalili to ___~visit ancient sites~buy souvenirs~play music~make furniture~1","Tourists visit ancient sites in the ___~evening~night~afternoon~morning~3","What can tourists do in the morning in Egypt?=>They can visit ancient sites like the pyramids. / They can walk to a small museum to learn more about history.","Why do people go to Khan El Khalili?=>They go there to buy souvenirs such as handmade gifts.","What can people do at night in Egypt?=>They can relax and listen to music."]],
+["The Nile River","The Nile is the longest river in the world. It is about 6,650 kilometers long. The Nile flows through Egypt from south to north. It goes through the desert and brings life to the country. Many animals live in and near the Nile. Big fish like Nile perch and tilapia swim in the water. Crocodiles live in the river too. They are dangerous animals. Many birds come to the river to drink and find food. You can see kingfishers, herons, and ducks near the Nile. The Nile is very important for Egyptian people. In the past, the river flooded and brought good soil.",["The Nile is the longest river in the world.~True~False~Not Given~I don't know~0","The Nile flows from north to east.~True~False~Not Given~I don't know~1","Crocodiles live in the Nile.~True~False~Not Given~I don't know~0","How long is the Nile River?=>The Nile River is about 6,650 kilometers long."]],
+["Healthy Habits","It's very important to have healthy habits. It's a good way to enjoy your life. Try to find a healthy balance of play and exercise, healthy food, water, social time, and good sleep. When you put together all these things, you can do your best and achieve everything you want. Put your phone away when you enjoy the outside world with your family and friends. If you have healthy habits, you feel strong, happy and have good relationships. We should learn these things from the early beginning.",["___ is the opposite of the word “outside”.~Incorrect~Inside~Strong~Helpful~1","___ is important for a healthy life.~Good sleep~Video games~Watching too much TV~Eating too much~0","How can you enjoy your life?=>I can enjoy my life by having healthy habits. / By finding a healthy balance of play, exercise, food, water, social time and sleep.","What happens if you have healthy habits?=>I feel strong, happy and have good relationships.","What are some examples of healthy habits mentioned in the text?=>Play and exercise, healthy food, water, social time, and good sleep."]]];
+const Q=(s)=>s.split("\n").map(x=>x.split("=>"));
+const RE=`1~plants / every / water / day / We=>We water plants every day. / Every day we water plants.
+3~grow / Farmers / fruits / many=>Farmers grow many fruits.
+5~check / I / insects / plants / the / on=>I check the insects on the plants. <span class=note>(item wording is loose)</span>
+7~sunny / Cairo / warm / and / is=>Cairo is sunny and warm. / Cairo is warm and sunny.
+9~Farmers / early / plants / water / morning / in / the=>Farmers water plants early in the morning.
+11~Nile / longest / the / river / is / The / world / in=>The Nile is the longest river in the world.
+13~Farmers / food / grow / soil / good / in=>Farmers grow food in good soil.
+15~Ancient / built / Egyptians / temples / near / river / the=>Ancient Egyptians built temples near the river.
+17~left / They / school / early / in / the / morning=>They left school early in the morning.
+19~a / guide / kind / showed / them / The / lakes=>The kind guide showed them lakes. <span class=note>⚠ "a" is extra</span>
+21~They / rode / the / bus / for / two / hours=>They rode the bus for two hours.
+23~after / lunch / They / visited / the / desert=>They visited the desert after lunch. / After lunch they visited the desert.
+25~They / saw / a / fossil / museum=>They saw a fossil museum.
+27~not / with / My / was / me / camera=>My camera was not with me.
+29~under / found / it / Mr. Ahmed / the / bench=>Mr. Ahmed found it under the bench.
+31~play / We / outside / can / tennis.=>We can play tennis outside.
+33~able to / She / draw / is / beautifully.=>She is able to draw beautifully.`;
+const PU=`1~did Hany play football yesterday=>Did Hany play football yesterday?
+2~Yes, there is a bank in aswan=>Yes, there is a bank in Aswan.
+3~the nile is the longest river in the world=>The Nile is the longest river in the world.
+4~tourists visit ancient sites like the pyramids=>Tourists visit ancient sites like the pyramids.
+5~khan el khalili is a famous place in cairo=>Khan El Khalili is a famous place in Cairo.
+6~dr mostafa el sayed is a famous egyptian scientist=>Dr. Mostafa El Sayed is a famous Egyptian scientist.
+7~he studied at ain shams university=>He studied at Ain Shams University.
+8~why did omar enjoy his visit to the museum=>Why did Omar enjoy his visit to the museum?
+9~we went to wadi el rayan last week=>We went to Wadi El Rayan last week.
+10~what is your favorite subject at school=>What is your favorite subject at school?`;
+const PW=`A day in Egypt (places · buy souvenirs · visit ancient sites)=>There are many places to visit in Egypt. In the morning, tourists visit ancient sites like the pyramids. Then they buy souvenirs from Khan El Khalili.
+Ras Mohamed National Park (beautiful places · protected · landscape · coral reefs · culture)=>Ras Mohamed is one of the most beautiful places in Egypt. It is a protected area with a quiet landscape. Visitors see colorful coral reefs and learn about the culture of the local people.
+Life in the village (simple · harvest · fishermen · spin wool)=>Life in the village is simple. Farmers harvest the crops and fishermen catch fish. Some families spin wool and weave it.
+Your school activities (morning line · classes · break time)=>Every day we start with the morning line. Then we have our classes. At break time, we eat and play with our friends.
+Egypt, Our beloved country (famous · Pyramids · visit · protect)=>Egypt is a famous country. Tourists visit the Pyramids from all over the world. We must protect our country and love it.
+How do plants help people and the environment? (food · clean air · shade)=>Plants give us food and clean air. They also give us shade on hot days. We should take care of plants.
+The school sports day (exciting · colorful clothes · games)=>The school sports day is exciting. We wear colorful clothes and play many games. We cheer for our friends and have fun.
+The school (Important role · honesty · subjects)=>The school has an important role in our life. We learn many subjects and learn honesty. We go to school to become better people.
+Your family (persons · father · happy)=>There are five persons in my family. My father works hard and my mother takes care of us. We are a happy family.`;
+const S=[["1 · MCQ","m"],["2 · Read & Complete","rc"],["3 · Correct Form","f"],["4 · Reading","r"],["5 · Rearrange","qa",RE],["6 · Punctuation","qa",PU],["7 · Paragraphs","qa",PW]];
+const bl=t=>t.replace(/\[\[(.+?)\]\]/g,(m,a)=>`<span class="b" data-a="${a.replace(/"/g,'&quot;')}">........</span>`);
+const strip=t=>t.replace(/<[^>]+>/g,"").replace(/\[\[.+?\]\]/g,"blank").replace(/___/g,"blank").replace(/ \/ /g,", ");
+let sc,tot;
+let V=null;function pick(){const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));for(const r of [/natural|online/i,/google (us|uk)/i,/samantha|aria|jenny|zira|daniel|karen|serena/i]){const f=v.find(x=>r.test(x.name));if(f)return f}return v.find(x=>x.lang=="en-US")||v[0]||null}
+try{speechSynthesis.onvoiceschanged=()=>V=pick()}catch(e){}
+const P={bar:null,s:[],i:0,on:false,id:0};
+function stopP(r){P.id++;try{speechSynthesis.cancel()}catch(e){}P.on=false;if(P.bar){P.bar.querySelector(".pp").textContent="▶";if(r){P.i=0;P.bar.querySelector(".pg").value=0}}}
+function su(b){if(P.bar!==b){stopP(true);P.bar=b;P.s=b.dataset.t.match(/[^.!?]+[.!?]*/g).map(x=>x.trim());P.i=0}}
+function playP(){if(!P.on)return;if(P.i>=P.s.length){stopP(true);return}const b=P.bar,u=new SpeechSynthesisUtterance(P.s[P.i]),id=P.id;V=V||pick();if(V)u.voice=V;u.lang="en-US";u.rate=+b.querySelector(".sd").value;b.querySelector(".pg").value=P.i/P.s.length*100;u.onend=()=>{if(P.on&&id==P.id){P.i++;playP()}};speechSynthesis.speak(u)}
+function tg(b){su(b);if(P.on){P.id++;speechSynthesis.cancel();P.on=false;b.querySelector(".pp").textContent="▶";return}P.on=true;b.querySelector(".pp").textContent="❚❚";if(P.i>=P.s.length)P.i=0;playP()}
+function say(t){stopP(true);try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(strip(t));V=V||pick();if(V)u.voice=V;u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+const ab=t=>`<div class="ab" data-t="${t.replace(/"/g,'&quot;')}"><button class="pp" title="Play / Pause">▶</button><button class="st" title="Stop">■</button><input type="range" class="pg" min="0" max="100" value="0"><select class="sd"><option value=".75">Slow</option><option value=".9" selected>Normal</option><option value="1.05">Fast</option></select></div>`;
+document.addEventListener("input",e=>{const t=e.target;if(!t.classList.contains("pg"))return;const b=t.closest(".ab");su(b);P.i=Math.min(P.s.length-1,Math.floor(t.value/100*P.s.length));if(P.on){P.id++;speechSynthesis.cancel();setTimeout(playP,60)}});
+const sp=t=>`<button class="sp" title="Listen" data-s="${strip(t).replace(/"/g,'&quot;')}">🔊</button>`;
+function mcq(s,i){const a=s.split("~"),n=a[0],q=a[1],o=a.slice(2,6),k=+a[6];tot++;
+return `<div class="card mc" data-k="${k}"><div class="q"><span class="n">${n}</span><span>${q.replace("___","<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>")}</span>${sp(q)}</div><div class="opts">${o.map((x,j)=>`<button class="opt" data-j="${j}">${"abcd"[j]}) ${x}</button>`).join("")}</div></div>`}
+function qa(s,i){const [l,a]=s.split("=>");const p=l.split("~");const n=p.length>1?p[0]:i+1,q=p.length>1?p.slice(1).join("~"):l;
+return `<div class="card"><div class="q"><span class="n">${n}</span><span>${q}</span>${sp(q)}</div><button class="rv">Show answer · الإجابة</button><div class="ans">✔ ${a}</div></div>`}
+function sec(i){const [nm,t,d]=S[i];sc=0;tot=0;let h=`<h2>${nm}</h2><div class="ctl"><button id="all">Show / hide all answers</button>${t=="m"?'<span class="sc" id="sc"></span>':""}</div>`;
+if(t=="m")h+=M.map(mcq).join("");
+if(t=="rc")h+=RC.map(([s,L])=>`<h2>${s}</h2>`+L.map(([l,b,x])=>`<div class="card"><div class="q"><span class="n">${l}</span><span style="font-weight:400;line-height:1.6">${bl(x)}</span></div>${ab(x.replace(/\[\[(.+?)\]\]/g,"$1").replace(/\(\d\)\s*/g,""))}<div class="box">${b.split(" | ").map(w=>`<i>${w}</i>`).join("")}</div></div>`).join("")).join("");
+if(t=="f")h+=F.map(x=>{const [n,q]=x.split("~");return `<div class="card"><div class="q"><span class="n">${n}</span><span>${bl(q)}</span>${sp(q)}</div></div>`}).join("");
+if(t=="r")h+=R.map(([ti,tx,it])=>`<div class="card"><h2 style="margin:0 0 8px">${ti}</h2>${ab(tx)}<div class="pass">${tx}</div></div>`+it.map((x,j)=>x.includes("=>")?qa(x,j):mcq((j+1)+"~"+x)).join("")).join("");
+if(t=="qa")h+=d.split("\n").map(qa).join("");
+stopP(true);P.bar=null;m.innerHTML=h;upd()}
+function upd(){const e=document.getElementById("sc");if(e)e.textContent=`Score: ${document.querySelectorAll(".opt.ok.u").length} / ${tot}`}
+nav.innerHTML=S.map((s,i)=>`<button data-i="${i}">${s[0]}</button>`).join("");
+document.addEventListener("click",e=>{const t=e.target;if(t.classList.contains("pp")){tg(t.closest(".ab"));return}if(t.classList.contains("st")){su(t.closest(".ab"));stopP(true);return}
+if(t.dataset.i!==undefined){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b==t));sec(+t.dataset.i);scrollTo(0,0)}
+else if(t.dataset.s)say(t.dataset.s);
+else if(t.classList.contains("b")){t.textContent=t.classList.toggle("show")?t.dataset.a:"........"}
+else if(t.classList.contains("rv"))t.nextElementSibling.classList.toggle("show");
+else if(t.classList.contains("opt")){const c=t.closest(".mc"),k=+c.dataset.k,o=c.querySelectorAll(".opt");if(c.dataset.d)return;c.dataset.d=1;o[k].classList.add("ok");if(+t.dataset.j==k)t.classList.add("u");else t.classList.add("no");upd()}
+else if(t.id=="all"){const on=!t.dataset.o;t.dataset.o=on?1:"";document.querySelectorAll(".b").forEach(b=>{b.classList.toggle("show",on);b.textContent=on?b.dataset.a:"........"});document.querySelectorAll(".ans").forEach(a=>a.classList.toggle("show",on));document.querySelectorAll(".mc").forEach(c=>{const o=c.querySelectorAll(".opt")[c.dataset.k];if(on)o.classList.add("ok");else if(!c.dataset.d)o.classList.remove("ok")})}
+});
+nav.firstChild.click();
+</script></body></html>
